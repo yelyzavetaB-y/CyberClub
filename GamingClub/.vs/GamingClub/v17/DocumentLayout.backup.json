@@ -1,0 +1,68 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\38098\\source\\repos\\GamingClub\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{731E3479-1970-45FD-AE0B-8198DE6162F0}|DataAccessLayer\\DataAccessLayer.csproj|c:\\users\\38098\\source\\repos\\gamingclub\\dataaccesslayer\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{731E3479-1970-45FD-AE0B-8198DE6162F0}|DataAccessLayer\\DataAccessLayer.csproj|solutionrelative:dataaccesslayer\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C0619862-619C-4784-8FA2-DB0716F27B55}|LogicLayer\\LogicLayer.csproj|c:\\users\\38098\\source\\repos\\gamingclub\\logiclayer\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C0619862-619C-4784-8FA2-DB0716F27B55}|LogicLayer\\LogicLayer.csproj|solutionrelative:logiclayer\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{eefa5220-e298-11d0-8f78-00a0c9110057}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\38098\\source\\repos\\GamingClub\\DataAccessLayer\\Program.cs",
+              "RelativeDocumentMoniker": "DataAccessLayer\\Program.cs",
+              "ToolTip": "C:\\Users\\38098\\source\\repos\\GamingClub\\DataAccessLayer\\Program.cs",
+              "RelativeToolTip": "DataAccessLayer\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-25T17:45:45.859Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\38098\\source\\repos\\GamingClub\\LogicLayer\\Program.cs",
+              "RelativeDocumentMoniker": "LogicLayer\\Program.cs",
+              "ToolTip": "C:\\Users\\38098\\source\\repos\\GamingClub\\LogicLayer\\Program.cs",
+              "RelativeToolTip": "LogicLayer\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-25T17:45:05.4Z",
+              "EditorCaption": ""
+            }
+          ]
+        },
+        {
+          "DockedWidth": 69,
+          "SelectedChildIndex": -1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,170 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\38098\\Desktop\\2025\\CyClub\\GamingClub\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{C0619862-619C-4784-8FA2-DB0716F27B55}|LogicLayer\\LogicLayer.csproj|c:\\users\\38098\\desktop\\2025\\cyclub\\gamingclub\\logiclayer\\models\\zone.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C0619862-619C-4784-8FA2-DB0716F27B55}|LogicLayer\\LogicLayer.csproj|solutionrelative:logiclayer\\models\\zone.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C0619862-619C-4784-8FA2-DB0716F27B55}|LogicLayer\\LogicLayer.csproj|c:\\users\\38098\\desktop\\2025\\cyclub\\gamingclub\\logiclayer\\models\\seat.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C0619862-619C-4784-8FA2-DB0716F27B55}|LogicLayer\\LogicLayer.csproj|solutionrelative:logiclayer\\models\\seat.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C0619862-619C-4784-8FA2-DB0716F27B55}|LogicLayer\\LogicLayer.csproj|c:\\users\\38098\\desktop\\2025\\cyclub\\gamingclub\\logiclayer\\models\\booking.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C0619862-619C-4784-8FA2-DB0716F27B55}|LogicLayer\\LogicLayer.csproj|solutionrelative:logiclayer\\models\\booking.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C0619862-619C-4784-8FA2-DB0716F27B55}|LogicLayer\\LogicLayer.csproj|c:\\users\\38098\\desktop\\2025\\cyclub\\gamingclub\\logiclayer\\models\\session.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C0619862-619C-4784-8FA2-DB0716F27B55}|LogicLayer\\LogicLayer.csproj|solutionrelative:logiclayer\\models\\session.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C0619862-619C-4784-8FA2-DB0716F27B55}|LogicLayer\\LogicLayer.csproj|c:\\users\\38098\\desktop\\2025\\cyclub\\gamingclub\\logiclayer\\models\\userprofile.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C0619862-619C-4784-8FA2-DB0716F27B55}|LogicLayer\\LogicLayer.csproj|solutionrelative:logiclayer\\models\\userprofile.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C0619862-619C-4784-8FA2-DB0716F27B55}|LogicLayer\\LogicLayer.csproj|c:\\users\\38098\\desktop\\2025\\cyclub\\gamingclub\\logiclayer\\models\\role.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C0619862-619C-4784-8FA2-DB0716F27B55}|LogicLayer\\LogicLayer.csproj|solutionrelative:logiclayer\\models\\role.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C0619862-619C-4784-8FA2-DB0716F27B55}|LogicLayer\\LogicLayer.csproj|c:\\users\\38098\\desktop\\2025\\cyclub\\gamingclub\\logiclayer\\models\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C0619862-619C-4784-8FA2-DB0716F27B55}|LogicLayer\\LogicLayer.csproj|solutionrelative:logiclayer\\models\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{731E3479-1970-45FD-AE0B-8198DE6162F0}|DataAccessLayer\\DataAccessLayer.csproj|c:\\users\\38098\\desktop\\2025\\cyclub\\gamingclub\\dataaccesslayer\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{731E3479-1970-45FD-AE0B-8198DE6162F0}|DataAccessLayer\\DataAccessLayer.csproj|solutionrelative:dataaccesslayer\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{eefa5220-e298-11d0-8f78-00a0c9110057}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Zone.cs",
+              "DocumentMoniker": "C:\\Users\\38098\\Desktop\\2025\\CyClub\\GamingClub\\LogicLayer\\Models\\Zone.cs",
+              "RelativeDocumentMoniker": "LogicLayer\\Models\\Zone.cs",
+              "ToolTip": "C:\\Users\\38098\\Desktop\\2025\\CyClub\\GamingClub\\LogicLayer\\Models\\Zone.cs",
+              "RelativeToolTip": "LogicLayer\\Models\\Zone.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAABBAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-25T18:30:00.668Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Seat.cs",
+              "DocumentMoniker": "C:\\Users\\38098\\Desktop\\2025\\CyClub\\GamingClub\\LogicLayer\\Models\\Seat.cs",
+              "RelativeDocumentMoniker": "LogicLayer\\Models\\Seat.cs",
+              "ToolTip": "C:\\Users\\38098\\Desktop\\2025\\CyClub\\GamingClub\\LogicLayer\\Models\\Seat.cs",
+              "RelativeToolTip": "LogicLayer\\Models\\Seat.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAtAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-25T18:29:37.267Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Session.cs",
+              "DocumentMoniker": "C:\\Users\\38098\\Desktop\\2025\\CyClub\\GamingClub\\LogicLayer\\Models\\Session.cs",
+              "RelativeDocumentMoniker": "LogicLayer\\Models\\Session.cs",
+              "ToolTip": "C:\\Users\\38098\\Desktop\\2025\\CyClub\\GamingClub\\LogicLayer\\Models\\Session.cs",
+              "RelativeToolTip": "LogicLayer\\Models\\Session.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-25T18:28:50.754Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Booking.cs",
+              "DocumentMoniker": "C:\\Users\\38098\\Desktop\\2025\\CyClub\\GamingClub\\LogicLayer\\Models\\Booking.cs",
+              "RelativeDocumentMoniker": "LogicLayer\\Models\\Booking.cs",
+              "ToolTip": "C:\\Users\\38098\\Desktop\\2025\\CyClub\\GamingClub\\LogicLayer\\Models\\Booking.cs",
+              "RelativeToolTip": "LogicLayer\\Models\\Booking.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAA3AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-25T18:28:39.948Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "Role.cs",
+              "DocumentMoniker": "C:\\Users\\38098\\Desktop\\2025\\CyClub\\GamingClub\\LogicLayer\\Models\\Role.cs",
+              "RelativeDocumentMoniker": "LogicLayer\\Models\\Role.cs",
+              "ToolTip": "C:\\Users\\38098\\Desktop\\2025\\CyClub\\GamingClub\\LogicLayer\\Models\\Role.cs",
+              "RelativeToolTip": "LogicLayer\\Models\\Role.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAoAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-25T18:27:54.886Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "UserProfile.cs",
+              "DocumentMoniker": "C:\\Users\\38098\\Desktop\\2025\\CyClub\\GamingClub\\LogicLayer\\Models\\UserProfile.cs",
+              "RelativeDocumentMoniker": "LogicLayer\\Models\\UserProfile.cs",
+              "ToolTip": "C:\\Users\\38098\\Desktop\\2025\\CyClub\\GamingClub\\LogicLayer\\Models\\UserProfile.cs",
+              "RelativeToolTip": "LogicLayer\\Models\\UserProfile.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAmAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-25T18:27:29.895Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "User.cs",
+              "DocumentMoniker": "C:\\Users\\38098\\Desktop\\2025\\CyClub\\GamingClub\\LogicLayer\\Models\\User.cs",
+              "RelativeDocumentMoniker": "LogicLayer\\Models\\User.cs",
+              "ToolTip": "C:\\Users\\38098\\Desktop\\2025\\CyClub\\GamingClub\\LogicLayer\\Models\\User.cs",
+              "RelativeToolTip": "LogicLayer\\Models\\User.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAoAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-25T18:26:56.046Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\38098\\Desktop\\2025\\CyClub\\GamingClub\\DataAccessLayer\\Program.cs",
+              "RelativeDocumentMoniker": "DataAccessLayer\\Program.cs",
+              "ToolTip": "C:\\Users\\38098\\Desktop\\2025\\CyClub\\GamingClub\\DataAccessLayer\\Program.cs",
+              "RelativeToolTip": "DataAccessLayer\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-25T17:45:45.859Z",
+              "EditorCaption": ""
+            }
+          ]
+        },
+        {
+          "DockedWidth": 69,
+          "SelectedChildIndex": -1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
