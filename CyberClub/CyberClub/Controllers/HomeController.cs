@@ -15,6 +15,11 @@ namespace CyberClub.Controllers
 
         public IActionResult Index()
         {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Login", "Auth");
+            }
+
             return View();
         }
 

@@ -1,15 +1,33 @@
+using CyberClub.Domain.Interfaces;
+using CyberClub.Domain.Services;
+using CyberClub.Infrastructure.DBService;
+using CyberClub.Infrastructure.Interfaces;
+using CyberClub.Infrastructure.Repositories;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
+
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+builder.Services.AddScoped<QueryBuilder>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<UserService>();
+builder.Services.AddSingleton<IConnectionStringProvider, ConnectionStringProvider>();
+
 builder.Services.AddControllersWithViews();
+//builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+//    .AddCookie(options =>
+//    {
+//        options.LoginPath = "/Auth/SignUp"; 
+//        options.AccessDeniedPath = "/Auth/AccessDenied"; 
+//    });
+builder.Services.AddSession();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
@@ -17,11 +35,12 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-
+app.UseSession();
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=index}/{id?}");
+  pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();

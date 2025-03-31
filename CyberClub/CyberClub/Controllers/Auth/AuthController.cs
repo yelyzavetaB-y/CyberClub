@@ -1,38 +1,97 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using CyberClub.Domain.Models;
+using CyberClub.Domain.Services;
+using CyberClub.ViewModels;
+using Microsoft.AspNetCore.Mvc;
 
 namespace CyberClub.Controllers.Auth
 {
-    [Route("[controller]")]
+    [Route("Auth")]
     public class AuthController : Controller
     {
-        [HttpGet]
-        public IActionResult Signup()
+        private readonly UserService _userService;
+
+        public AuthController(UserService userService)
         {
-            return View();
+            _userService = userService;
         }
 
-        [HttpPost]
-        public IActionResult Signup(string email, string password, string confirmPassword)
+        [HttpPost("Logout")]
+        public async Task<IActionResult> Logout()
         {
-            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password) || password != confirmPassword)
-            {
-                ViewBag.Error = "Invalid data provided.";
-                return View();
-            }
-
-            return RedirectToAction("Index", "Home");
+            HttpContext.Session.Clear();
+            return RedirectToAction("Login", "Auth");
         }
-        [HttpGet("login")]
+
+
+
+        [HttpGet("")]
+        [HttpGet("Login")]
         public IActionResult Login()
         {
+            if (HttpContext.Session.GetString("User") != null)
+            {
+                return RedirectToAction("Panel", "Customer");
+            }
+            return View();
+        }
+        [HttpPost("Login")]
+        public async Task<IActionResult> Login(LoginViewModel loginViewModel)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userService.AuthenticateUserAsync(loginViewModel.Email, loginViewModel.Password);
+                if (user != null)
+                {
+                    HttpContext.Session.SetString("User", user.Email);
+                    return RedirectToAction("Panel", "Customer");
+                }
+                ModelState.AddModelError("", "error");
+            }
+            return View(loginViewModel);
+        }
+
+        [HttpGet("Signup")]
+        public IActionResult Signup()
+        {
+            if (HttpContext.Session.GetString("User") != null)
+            {
+                return RedirectToAction("Panel", "Customer");
+            }
             return View();
         }
 
-        [HttpPost("login")]
-        public IActionResult Login(string username, string password)
+        [HttpPost("Signup")]
+        public async Task<IActionResult> Signup(UserViewModel model)
         {
-            return RedirectToAction("Index", "Home");
-        }
+            if (ModelState.IsValid)
+            {
+                var user = new User
+                {
+                    Email = model.Email,
+                    RoleId = model.RoleId,
+                    FullName = model.FullName,
+                    HashPassword = model.Password
+                };
 
+                var userProfile = new UserProfile
+                {
+                    PhoneNumber = model.PhoneNumber,
+                    DOB = model.DOB.Value,
+                    User = user
+                };
+
+                bool isCreated = await _userService.CreateUserWithProfileAsync(user, userProfile);
+                if (isCreated)
+                {
+                    return RedirectToAction("Login", "Auth");
+                }
+                else
+                {
+                    ModelState.AddModelError("", "error");
+                }
+            }
+
+            return View(model);
+        }
     }
 }
