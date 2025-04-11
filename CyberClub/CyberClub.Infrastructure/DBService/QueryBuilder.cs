@@ -71,7 +71,8 @@ namespace CyberClub.Infrastructure.DBService
                 {
                     command.Parameters.AddRange(parameters);
                     object result = await command.ExecuteScalarAsync();
-                    return (T)result;
+                    return (T)Convert.ChangeType(result, typeof(T));
+
                 }
             }
         }

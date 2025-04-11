@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@model CyberClub.ViewModels.BookingViewModel
+
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -6,11 +8,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>CyberCLub</title>
 
-    <!-- Meta -->
-    <meta name="description" content="CyberCLub" />
-    <meta name="author" content="Student" />
-    <link rel="canonical" href="https://www.bootstrap.gallery/">
-    <meta property="og:url" content="https://www.bootstrap.gallery">
     <meta property="og:title" content="CyberCLub | Student">
     <meta property="og:description" content="CyberCLub">
     <meta property="og:type" content="Website">
@@ -49,88 +46,92 @@
                 </div>
                 <!-- App brand ends -->
                 <!-- Sidebar menu starts -->
-                <div class="sidebarMenuScroll">
-                    <ul class="sidebar-menu">
-                        <li class="active current-page">
-                            <a href="index.html">
-                                <i class="bi bi-laptop"></i>
-                                <span class="menu-text">Analytics</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="reports.html">
-                                <i class="bi bi-bar-chart-line"></i>
-                                <span class="menu-text">Reports</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="customers.html">
-                                <i class="bi bi-globe"></i>
-                                <span class="menu-text">Customers</span>
-                            </a>
-                        </li>
 
-                        <li class="treeview">
-                            <a href="index.html#!">
-                                <i class="bi bi-ui-checks-grid"></i>
-                                <span class="menu-text">Choose a Zone</span>
-                            </a>
-                            <ul class="treeview-menu">
-                                <li>
-                                    <!-- Combobox -->
-                                    <label>Select Option:</label>
-                                    <select class="form-control">
-                                        <option value="">Please choose</option>
-                                        <option value="option1">Option 1</option>
-                                        <option value="option2">Option 2</option>
-                                        <option value="option3">Option 3</option>
-                                    </select>
+                <div class="sidebarMenuScroll">
+                    <form asp-action="UpdateBooking" method="post">
+                        <ul class="sidebar-menu">
+
+                            @* <li class="active current-page">
+                                <a href="/Customer/Panel">
+                                    <i class="bi bi-laptop"></i>
+                                    <span class="menu-text">Analytics</span>
+                                </a>
+                            </li> *@
+
+                            @if (Model is CyberClub.ViewModels.BookingViewModel booking)
+                            {
+                                <li class="treeview">
+                                    <a href="#">
+                                        <i class="bi bi-ui-checks-grid"></i>
+                                        <span class="menu-text">Choose a Zone</span>
+                                    </a>
+                                    <ul class="treeview-menu">
+                                        <li>
+                                            <label>Select Zone:</label>
+                                            <select class="form-control" asp-for="SelectedZoneId" onchange="this.form.submit();">
+                                                <option value="">Please choose</option>
+                                                @foreach (var zone in booking.Zones)
+                                                {
+                                                    <option value="@zone.ZoneID">@zone.Name</option>
+                                                }
+                                            </select>
+                                        </li>
+                                    </ul>
                                 </li>
-                            </ul>
-                        </li>
-                        <li class="treeview">
-                            <ul class="treeview-menu" id="seatList" style="display:none;">
-                                <!-- Seats will be appended here -->
-                            </ul>
-                        </li>
-                        <li class="treeview">
-                            <a href="index.html#!">
-                                <i class="bi bi-ui-checks-grid"></i>
-                                <span class="menu-text">Choose a slot</span>
-                            </a>
-                            <ul class="treeview-menu">
-                                <li>
-                                    <!-- Date input -->
-                                    <label>Date:</label>
-                                    <input type="date" class="form-control">
+
+                                <li class="treeview">
+                                    <a href="#">
+                                        <i class="bi bi-person-check"></i>
+                                        <span class="menu-text">Choose a Seat</span>
+                                    </a>
+                                    <ul class="treeview-menu" id="seatList" style="@(booking.Seats != null && booking.Seats.Any() ? "" : "display:none;")">
+                                        @if (booking.Seats != null && booking.Seats.Any())
+                                        {
+                                            foreach (var seat in booking.Seats)
+                                            {
+                                                <li>
+                                                    <label>
+                                                        <input type="radio" name="SelectedSeatId" value="@seat.SeatID" />
+                                                        @seat.SeatNumber
+                                                    </label>
+                                                </li>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <li>No seats available.</li>
+                                        }
+                                    </ul>
                                 </li>
-                                <li>
-                                    <!-- Time input -->
-                                    <label>Time:</label>
-                                    <input type="time" class="form-control">
-                                </li>
-                                <li>
-                                    <!-- Combobox -->
-                                    <label>Select Option:</label>
-                                    <select class="form-control">
-                                        <option value="">Please choose</option>
-                                        <option value="option1">Option 1</option>
-                                        <option value="option2">Option 2</option>
-                                        <option value="option3">Option 3</option>
-                                    </select>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
-                </div>
-                <!-- Sidebar menu ends -->
-                <!-- Sidebar settings starts -->
-                <div class="sidebar-settings gap-1 d-lg-flex d-none">
-                    <form method="post" action="/Auth/Logout">
-                        <button type="submit" class="settings-icon" data-bs-toggle="tooltip" data-bs-placement="top"
-                                data-bs-custom-class="custom-tooltip-secondary" title="Logout">
-                            <i class="bi bi-power"></i>
-                        </button>
+                            }
+
+                            <li class="treeview">
+                                <a href="#">
+                                    <i class="bi bi-ui-checks-grid"></i>
+                                    <span class="menu-text">Choose a slot</span>
+                                </a>
+                                <ul class="treeview-menu">
+                                    <li>
+                                        <label>Date:</label>
+                                        <input asp-for="SelectedDate" type="date" class="form-control" />
+                                    </li>
+                                    <li>
+                                        <label>Time:</label>
+                                        <input asp-for="SelectedTime" type="time" class="form-control" />
+                                    </li>
+                                    <li>
+                                        <label>Duration (minutes):</label>
+                                        <input asp-for="Duration" type="number" class="form-control" min="30" step="30" />
+                                    </li>
+                                </ul>
+                            </li>
+
+                            <li>
+                                <input type="hidden" name="UserID" value="@Context.Session.GetInt32("UserID")" />
+                                <button type="submit" formaction="/Customer/FinalizeBooking" class="btn btn-primary mt-3 w-100">Book Now</button>
+                            </li>
+
+                        </ul>
                     </form>
                 </div>
                 <!-- Sidebar settings ends -->
@@ -153,13 +154,13 @@
                     <!-- App brand sm starts -->
                     <div class="app-brand-sm d-lg-none d-flex">
                         <a href="index.html">
-                            <img src="~/assets/images/logo-sm.svg" class="logo" alt="Axis Bootstrap Template" />
+                            <img src="~/assets/images/logo-sm.svg" class="logo" alt="CyberClub" />
                         </a>
                     </div>
                     <!-- App brand sm ends -->
                     <!-- Breadcrumb starts -->
                     <div class="d-flex align-items-center ms-3">
-                        <h5 class="m-0">Analytics</h5>
+                        <h5 class="m-0"></h5>
                     </div>
                     <!-- Breadcrumb ends -->
                     <!-- App header actions starts -->
@@ -223,11 +224,110 @@
                 <!-- App body starts -->
                 <div class="app-body">
                     @RenderBody()
+
                     <div class="col-xl-4 col-sm-6">
                         <div class="card mb-4">
-                            <div class="card-header">
-                                <h5 class="card-title">Payments</h5>
+                            @* <div class="card-header">
+                                <h5 class="card-title"></h5>
+                            </div> *@
+                            <!-- DEMO SEAT MAP START (for testing only) -->
+                            <style>
+                               
+                                .zone {
+                                    display: grid;
+                                    grid-template-columns: repeat(4, 1fr);
+                                    gap: 10px;
+                                    padding: 15px;
+                                    background: #1e1e1e;
+                                    border-radius: 10px;
+                                    box-shadow: 0 0 8px rgba(0,0,0,0.3);
+                                    align-content: start;
+                                    min-width: 600px;
+                                }
+
+                                .zone-title {
+                                    grid-column: span 4;
+                                    text-align: center;
+                                    font-weight: bold;
+                                    margin-bottom: 10px;
+                                }
+
+                                .seat {
+                                    height: 50px;
+                                    background-color: #4caf50;
+                                    border-radius: 8px;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    font-weight: bold;
+                                    font-size: 12px;
+                                    cursor: pointer;
+                                    transition: all 0.2s ease;
+                                    user-select: none;
+                                    transform: scale(1);
+                                }
+
+                                    .seat.booked {
+                                        background-color: #f44336;
+                                        cursor: not-allowed;
+                                        opacity: 0.6;
+                                    }
+
+                                    .seat.selected {
+                                        background-color: #ffd700 !important;
+                                        color: #000;
+                                        transform: scale(1.05);
+                                    }
+
+                                    .seat:hover:not(.booked):not(.selected) {
+                                        background-color: #66bb6a;
+                                        transform: scale(1.03);
+                                    }
+
+                                .console-zone .seat {
+                                    background-color: #673ab7;
+                                }
+
+                                    .console-zone .seat.selected {
+                                        background-color: #d1c4e9 !important;
+                                        color: #000;
+                                    }
+                            </style>
+
+                            <div class="zone" id="zoneVip">
+                                <div class="zone-title">VIP Zone</div>
                             </div>
+                            <div class="zone" id="zonePro">
+                                <div class="zone-title">Pro Zone</div>
+                            </div>
+                            <div class="zone console-zone" id="zoneConsoles">
+                                <div class="zone-title">Console Zone</div>
+                            </div>
+
+                            <script>
+                                function generateSeats(containerId, start, end, bookedList) {
+                                    const container = document.getElementById(containerId);
+                                    for (let i = start; i <= end; i++) {
+                                        const seat = document.createElement('div');
+                                        seat.classList.add('seat');
+                                        seat.textContent = `PC ${i}`;
+                                        if (bookedList.includes(i)) {
+                                            seat.classList.add('booked');
+                                        } else {
+                                            seat.addEventListener('click', function () {
+                                                document.querySelectorAll('.seat.selected').forEach(s => s.classList.remove('selected'));
+                                                this.classList.add('selected');
+                                            });
+                                        }
+                                        container.appendChild(seat);
+                                    }
+                                }
+
+                                generateSeats('zoneVip', 1, 5, [3]);
+                                generateSeats('zonePro', 6, 12, [9]);
+                                generateSeats('zoneConsoles', 13, 18, [15]);
+                            </script>
+                            <!-- DEMO SEAT MAP END -->
                         </div>
                     </div>
                 </div>
@@ -263,6 +363,31 @@
     <!-- *************
              ************ JavaScript Files *************
          ************* -->
+
+    <script>
+        document.getElementById('zoneSelect').addEventListener('change', function () {
+            const zoneId = this.value;
+            const seatList = document.getElementById('seatList');
+            seatList.innerHTML = "<li>Loading...</li>";
+
+            fetch(`/Customer/GetSeatsByZone?zoneId=${zoneId}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.length === 0) {
+                        seatList.innerHTML = '<li>No seats available.</li>';
+                    } else {
+                        seatList.innerHTML = '';
+                        data.forEach(seat => {
+                            const li = document.createElement('li');
+                            li.textContent = seat.description;
+                            seatList.appendChild(li);
+                        });
+                    }
+                });
+        });
+    </script>
+
+
     <!-- Required jQuery first, then Bootstrap Bundle JS -->
     <script src="~/assets/js/jquery.min.js"></script>
     <script src="~/assets/js/bootstrap.bundle.min.js"></script>

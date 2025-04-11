@@ -120,7 +120,6 @@ namespace CyberClub.Domain.Services
             }
             catch
             {
-                //Logging...
                 return false;
             }
         }

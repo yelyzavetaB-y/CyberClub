@@ -16,7 +16,7 @@ namespace CyberClub.Controllers.Auth
         }
 
         [HttpPost("Logout")]
-        public async Task<IActionResult> Logout()
+        public async Task<IActionResult> Logout()                                    /*A-UC-2*/
         {
             HttpContext.Session.Clear();
             return RedirectToAction("Login", "Auth");
@@ -25,7 +25,7 @@ namespace CyberClub.Controllers.Auth
 
 
         [HttpGet("")]
-        [HttpGet("Login")]
+        [HttpGet("Login")]                                                           /*A-UC-0*/
         public IActionResult Login()
         {
             if (HttpContext.Session.GetString("User") != null)
@@ -34,7 +34,9 @@ namespace CyberClub.Controllers.Auth
             }
             return View();
         }
-        [HttpPost("Login")]
+
+
+        [HttpPost("Login")]                                                          /*A-UC-1*/
         public async Task<IActionResult> Login(LoginViewModel loginViewModel)
         {
             if (ModelState.IsValid)
@@ -42,6 +44,7 @@ namespace CyberClub.Controllers.Auth
                 var user = await _userService.AuthenticateUserAsync(loginViewModel.Email, loginViewModel.Password);
                 if (user != null)
                 {
+                    HttpContext.Session.SetInt32("UserID", user.Id);
                     HttpContext.Session.SetString("User", user.Email);
                     return RedirectToAction("Panel", "Customer");
                 }
@@ -50,7 +53,7 @@ namespace CyberClub.Controllers.Auth
             return View(loginViewModel);
         }
 
-        [HttpGet("Signup")]
+        [HttpGet("Signup")]                                                        /*C-UC-0*/
         public IActionResult Signup()
         {
             if (HttpContext.Session.GetString("User") != null)
@@ -60,7 +63,7 @@ namespace CyberClub.Controllers.Auth
             return View();
         }
 
-        [HttpPost("Signup")]
+        [HttpPost("Signup")]                                                               /*C-UC-1*/
         public async Task<IActionResult> Signup(UserViewModel model)
         {
             if (ModelState.IsValid)

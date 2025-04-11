@@ -196,6 +196,7 @@ namespace CyberClub.Infrastructure.Repositories
 
             return affectedRows > 0;
         }
+
         public async Task<User> FindByEmailAsync(string email)
         {
             User user = null;
