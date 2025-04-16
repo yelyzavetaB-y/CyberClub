@@ -31,25 +31,53 @@ namespace CyberClub.Infrastructure.Repositories
             int seatId = await _queryBuilder.ExecuteScalarAsync<int>(query, parameters);
             return seatId > 0;
         }
+        
 
-        public async Task<Seat> FindAvailableSeatAsync()
+
+        public async Task<List<Seat>> FindAvailableSeatAsync(int zoneId, DateTime startTime, int duration)
         {
-            const string query = @"SELECT TOP 1 SeatID, SeatNumber, ZoneID, IsAvailable, ReservedStartTime
-                               FROM Seat WHERE IsAvailable = 1 ORDER BY ZoneID ASC;";
+            DateTime endTime = startTime.AddMinutes(duration);
+            const string query = @"SELECT s.SeatID, s.SeatNumber
+    FROM Seat s
+    WHERE s.ZoneID = @ZoneID
+     AND s.IsAvailable = 1
+     AND NOT EXISTS (
+      SELECT 1
+      FROM Booking b
+      WHERE b.SeatID = s.SeatID
+        AND b.Status = 'Confirmed' 
+        AND (
+            @StartTime < DATEADD(MINUTE, b.Duration, b.StartTime)
+            AND @EndTime > b.StartTime
+        )
+  )
+ORDER BY s.SeatNumber;";
 
-            Seat seat = null;
+            SqlParameter[] parameters =
+            {
+               new SqlParameter("@ZoneID", zoneId),
+                new SqlParameter("@StartTime", startTime),
+                new SqlParameter("@EndTime", endTime)
+
+            };
+
+            List<Seat> seats = new();
 
             await _queryBuilder.ExecuteQueryAsync(query, reader =>
             {
-                if (reader.Read())
+                while (reader.Read())
                 {
-                    seat = MapSeat(reader);
+                    seats.Add(new Seat
+                    {
+                        SeatID = reader.GetInt32(reader.GetOrdinal("SeatID")),
+                        SeatNumber = reader.GetString(reader.GetOrdinal("SeatNumber"))
+                    });
                 }
-            });
+            }, parameters);
 
-            return seat;
+            return seats;
         }
-
+        
         public async Task<bool> UpdateSeatAvailabilityAsync(int seatId, bool isAvailable)
         {
             const string query = "UPDATE Seat SET IsAvailable = @IsAvailable WHERE SeatID = @SeatID";
@@ -66,7 +94,7 @@ namespace CyberClub.Infrastructure.Repositories
 
         public async Task<Seat> GetSeatByIdAsync(int seatId)
         {
-            const string query = @"SELECT SeatID, SeatNumber, ZoneID, IsAvailable, ReservedStartTime
+            const string query = @"SELECT SeatID, SeatNumber, ZoneID, IsAvailable, StartTime
                                FROM Seat WHERE SeatID = @SeatID";
 
             var parameters = new[]
@@ -89,7 +117,7 @@ namespace CyberClub.Infrastructure.Repositories
 
         public async Task<List<Seat>> GetSeatsByZoneIdAsync(int zoneId)
         {
-            const string query = @"SELECT SeatID, SeatNumber, ZoneID, IsAvailable, ReservedStartTime
+            const string query = @"SELECT SeatID, SeatNumber, ZoneID, IsAvailable, StartTime
                                FROM Seat WHERE ZoneID = @ZoneID";
 
             var parameters = new[]
@@ -118,9 +146,7 @@ namespace CyberClub.Infrastructure.Repositories
                 ZoneID = reader.GetInt32(reader.GetOrdinal("ZoneID")),
                 SeatNumber = reader.GetString(reader.GetOrdinal("SeatNumber")),
                 IsAvailable = reader.GetBoolean(reader.GetOrdinal("IsAvailable")),
-                ReservedStartTime = reader.IsDBNull(reader.GetOrdinal("ReservedStartTime"))
-                    ? (DateTime?)null
-                    : reader.GetDateTime(reader.GetOrdinal("ReservedStartTime"))
+               
             };
         }
     }

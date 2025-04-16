@@ -13,7 +13,7 @@ namespace CyberClub.Domain.Models
         public Status Status { get; set; }
         public int UserId { get; set; }
         public int SeatId { get; set; }
-        public DateTime ReservedStartTime { get; set; }
+        public DateTime StartTime { get; set; }
         public int Duration { get; set; }
     }
 }

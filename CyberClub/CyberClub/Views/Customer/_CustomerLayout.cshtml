@@ -63,6 +63,27 @@
                                 <li class="treeview">
                                     <a href="#">
                                         <i class="bi bi-ui-checks-grid"></i>
+                                        <span class="menu-text">Choose a slot</span>
+                                    </a>
+                                    <ul class="treeview-menu">
+                                        <li>
+                                            <label>Date:</label>
+                                            <input asp-for="SelectedDate" type="date" class="form-control" />
+                                        </li>
+                                        <li>
+                                            <label>Time:</label>
+                                            <input asp-for="SelectedTime" type="time" class="form-control" />
+                                        </li>
+                                        <li>
+                                            <label>Duration (minutes):</label>
+                                            <input asp-for="Duration" type="number" class="form-control" min="30" step="30" />
+                                        </li>
+                                    </ul>
+                                </li>
+
+                                <li class="treeview">
+                                    <a href="#">
+                                        <i class="bi bi-ui-checks-grid"></i>
                                         <span class="menu-text">Choose a Zone</span>
                                     </a>
                                     <ul class="treeview-menu">
@@ -79,6 +100,7 @@
                                     </ul>
                                 </li>
 
+                              
                                 <li class="treeview">
                                     <a href="#">
                                         <i class="bi bi-person-check"></i>
@@ -105,29 +127,10 @@
                                 </li>
                             }
 
-                            <li class="treeview">
-                                <a href="#">
-                                    <i class="bi bi-ui-checks-grid"></i>
-                                    <span class="menu-text">Choose a slot</span>
-                                </a>
-                                <ul class="treeview-menu">
-                                    <li>
-                                        <label>Date:</label>
-                                        <input asp-for="SelectedDate" type="date" class="form-control" />
-                                    </li>
-                                    <li>
-                                        <label>Time:</label>
-                                        <input asp-for="SelectedTime" type="time" class="form-control" />
-                                    </li>
-                                    <li>
-                                        <label>Duration (minutes):</label>
-                                        <input asp-for="Duration" type="number" class="form-control" min="30" step="30" />
-                                    </li>
-                                </ul>
-                            </li>
-
+                          
                             <li>
                                 <input type="hidden" name="UserID" value="@Context.Session.GetInt32("UserID")" />
+                                <input type="hidden" name="SelectedSeatId" id="SelectedSeatId" />
                                 <button type="submit" formaction="/Customer/FinalizeBooking" class="btn btn-primary mt-3 w-100">Book Now</button>
                             </li>
 
@@ -171,17 +174,7 @@
                             <input type="text" class="form-control" id="searchData" placeholder="Search" />
                             <i class="bi bi-search"></i>
                         </div>
-                        <!-- Search container ends -->
-                        <!-- Header list starts -->
-                        <!-- <div class="d-sm-flex d-none gap-3">
-                          <div class="dropdown">
-                            <a class="dropdown-toggle action-icon" href="index.html#!" role="button" data-bs-toggle="dropdown"
-                              aria-expanded="false">
-                              <i class="bi bi-cart2 lh-1"></i>
-                              <span class="count-label">3</span>
-                            </a>
-                          </div>
-                        </div> -->
+                     
                         <!-- Header list starts -->
                         <!-- User settings starts -->
                         <div class="dropdown ms-4">
@@ -227,107 +220,8 @@
 
                     <div class="col-xl-4 col-sm-6">
                         <div class="card mb-4">
-                            @* <div class="card-header">
-                                <h5 class="card-title"></h5>
-                            </div> *@
-                            <!-- DEMO SEAT MAP START (for testing only) -->
-                            <style>
-                               
-                                .zone {
-                                    display: grid;
-                                    grid-template-columns: repeat(4, 1fr);
-                                    gap: 10px;
-                                    padding: 15px;
-                                    background: #1e1e1e;
-                                    border-radius: 10px;
-                                    box-shadow: 0 0 8px rgba(0,0,0,0.3);
-                                    align-content: start;
-                                    min-width: 600px;
-                                }
-
-                                .zone-title {
-                                    grid-column: span 4;
-                                    text-align: center;
-                                    font-weight: bold;
-                                    margin-bottom: 10px;
-                                }
-
-                                .seat {
-                                    height: 50px;
-                                    background-color: #4caf50;
-                                    border-radius: 8px;
-                                    display: flex;
-                                    align-items: center;
-                                    justify-content: center;
-                                    font-weight: bold;
-                                    font-size: 12px;
-                                    cursor: pointer;
-                                    transition: all 0.2s ease;
-                                    user-select: none;
-                                    transform: scale(1);
-                                }
-
-                                    .seat.booked {
-                                        background-color: #f44336;
-                                        cursor: not-allowed;
-                                        opacity: 0.6;
-                                    }
-
-                                    .seat.selected {
-                                        background-color: #ffd700 !important;
-                                        color: #000;
-                                        transform: scale(1.05);
-                                    }
-
-                                    .seat:hover:not(.booked):not(.selected) {
-                                        background-color: #66bb6a;
-                                        transform: scale(1.03);
-                                    }
-
-                                .console-zone .seat {
-                                    background-color: #673ab7;
-                                }
-
-                                    .console-zone .seat.selected {
-                                        background-color: #d1c4e9 !important;
-                                        color: #000;
-                                    }
-                            </style>
-
-                            <div class="zone" id="zoneVip">
-                                <div class="zone-title">VIP Zone</div>
-                            </div>
-                            <div class="zone" id="zonePro">
-                                <div class="zone-title">Pro Zone</div>
-                            </div>
-                            <div class="zone console-zone" id="zoneConsoles">
-                                <div class="zone-title">Console Zone</div>
-                            </div>
-
-                            <script>
-                                function generateSeats(containerId, start, end, bookedList) {
-                                    const container = document.getElementById(containerId);
-                                    for (let i = start; i <= end; i++) {
-                                        const seat = document.createElement('div');
-                                        seat.classList.add('seat');
-                                        seat.textContent = `PC ${i}`;
-                                        if (bookedList.includes(i)) {
-                                            seat.classList.add('booked');
-                                        } else {
-                                            seat.addEventListener('click', function () {
-                                                document.querySelectorAll('.seat.selected').forEach(s => s.classList.remove('selected'));
-                                                this.classList.add('selected');
-                                            });
-                                        }
-                                        container.appendChild(seat);
-                                    }
-                                }
-
-                                generateSeats('zoneVip', 1, 5, [3]);
-                                generateSeats('zonePro', 6, 12, [9]);
-                                generateSeats('zoneConsoles', 13, 18, [15]);
-                            </script>
-                            <!-- DEMO SEAT MAP END -->
+                          
+                            
                         </div>
                     </div>
                 </div>
@@ -364,27 +258,29 @@
              ************ JavaScript Files *************
          ************* -->
 
-    <script>
-        document.getElementById('zoneSelect').addEventListener('change', function () {
-            const zoneId = this.value;
-            const seatList = document.getElementById('seatList');
-            seatList.innerHTML = "<li>Loading...</li>";
 
-            fetch(`/Customer/GetSeatsByZone?zoneId=${zoneId}`)
-                .then(res => res.json())
-                .then(data => {
-                    if (data.length === 0) {
-                        seatList.innerHTML = '<li>No seats available.</li>';
-                    } else {
-                        seatList.innerHTML = '';
-                        data.forEach(seat => {
-                            const li = document.createElement('li');
-                            li.textContent = seat.description;
-                            seatList.appendChild(li);
-                        });
-                    }
-                });
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const dateInput = document.querySelector('[name="SelectedDate"]');
+
+            dateInput.addEventListener("change", () => {
+                // Перевіримо, що є й інші дані
+                const zoneId = document.querySelector('[name="SelectedZoneId"]').value;
+                const time = document.querySelector('[name="SelectedTime"]').value;
+                const duration = document.querySelector('[name="Duration"]').value;
+
+                if (zoneId && time && duration) {
+                    loadCurrentZone(); // Завантажуємо мапу сидінь
+                    showSeatMap();     // Робимо блок мапи видимим
+                }
+            });
         });
+
+        function showSeatMap() {
+            document.getElementById('zoneVip').style.display = 'grid';
+            document.getElementById('zonePro').style.display = 'grid';
+            document.getElementById('zoneConsoles').style.display = 'grid';
+        }
     </script>
 
 

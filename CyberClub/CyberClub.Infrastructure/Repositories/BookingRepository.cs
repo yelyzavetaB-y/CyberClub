@@ -27,7 +27,7 @@ namespace CyberClub.Infrastructure.Repositories
     new SqlParameter("@UserID", booking.UserId),
     new SqlParameter("@SeatID", booking.SeatId),
     new SqlParameter("@Status", booking.Status.ToString()),
-    new SqlParameter("@StartTime", booking.ReservedStartTime), 
+    new SqlParameter("@StartTime", booking.StartTime), 
     new SqlParameter("@Duration", booking.Duration)
         };
 
@@ -36,9 +36,10 @@ namespace CyberClub.Infrastructure.Repositories
             return bookingId > 0;
         }
 
-        public async Task<bool> BookAvailableSeatAsync(int userId, DateTime reservedStartTime)
+        public async Task<bool> BookAvailableSeatAsync(int userId, DateTime startTime, int zoneId, int duration)
         {
-            Seat availableSeat = await _seatRepository.FindAvailableSeatAsync();
+            List<Seat> availableSeats = await _seatRepository.FindAvailableSeatAsync(zoneId, startTime, duration);
+            Seat availableSeat = availableSeats.FirstOrDefault();
             if (availableSeat == null)
                 return false; 
             Booking booking = new Booking
@@ -46,12 +47,41 @@ namespace CyberClub.Infrastructure.Repositories
                 UserId = userId,
                 SeatId = availableSeat.SeatID,
                 Status = Status.Confirmed,
-                ReservedStartTime = reservedStartTime
+                StartTime = startTime
             };
 
             return await AddBookingAsync(booking);
         }
 
+        public async Task<List<int>> GetBookedSeatIdsAsync(int zoneId, DateTime start, DateTime end)
+        {
+            string query = @"
+SELECT b.SeatID
+FROM Booking b
+JOIN Seat s ON b.SeatID = s.SeatID
+WHERE s.ZoneID = @ZoneId
+  AND b.Status = 'Confirmed'
+  AND (
+    @StartTime < DATEADD(MINUTE, b.Duration, b.StartTime)
+    AND @EndTime > b.StartTime
+)";
+
+            var parameters = new[]
+            {
+        new SqlParameter("@ZoneId", zoneId),
+        new SqlParameter("@StartTime", start),
+        new SqlParameter("@EndTime", end)
+    };
+
+            List<int> bookedSeats = new();
+            await _queryBuilder.ExecuteQueryAsync(query, reader =>
+            {
+                while (reader.Read())
+                    bookedSeats.Add(reader.GetInt32(0));
+            }, parameters);
+
+            return bookedSeats;
+        }
 
     }
 

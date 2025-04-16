@@ -28,11 +28,14 @@ namespace CyberClub.Controllers.Customer
         {
             model.Zones = await _zoneService.GetAllZonesAsync();
             model.UserID = HttpContext.Session.GetInt32("UserID") ?? 0;
-            if (model.SelectedZoneId > 0)
+            if (model.SelectedZoneId > 0 && model.SelectedDate != default && model.SelectedTime != default && model.Duration > 0)
             {
-                model.Seats = await _seatService.GetSeatsByZoneIdAsync(model.SelectedZoneId);
+                model.Seats = await _seatService.GetAvailableSeatAsync(
+                    model.SelectedZoneId,
+                    model.SelectedDate.Date + model.SelectedTime,
+                    model.Duration
+                );
             }
-
             return View("CustomerPanel", model);
         }
 
@@ -65,7 +68,7 @@ namespace CyberClub.Controllers.Customer
                 return View("CustomerPanel", model);
             }
 
-            return RedirectToAction("CustomerPanel");
+            return RedirectToAction("Customer");
         }     
 
         public IActionResult Confirmation()

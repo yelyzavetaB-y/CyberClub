@@ -11,14 +11,36 @@ namespace CyberClub.Domain.Services
     public class SeatService
     {
         private readonly ISeatRepository seatRepository;
-
-        public SeatService(ISeatRepository seatRepository)
+        private readonly IBookingRepository bookingRepository;
+        public SeatService(ISeatRepository seatRepository, IBookingRepository bookingRepository)
         {
             this.seatRepository = seatRepository;
+            this.bookingRepository = bookingRepository;
         }
         public async Task<List<Seat>> GetSeatsByZoneIdAsync(int zoneId)
         {
             return await seatRepository.GetSeatsByZoneIdAsync(zoneId);
         }
+        public async Task<List<Seat>> GetAvailableSeatAsync(int zoneId, DateTime startTime, int duration)
+        {
+            return await seatRepository.FindAvailableSeatAsync(zoneId, startTime, duration);
+        }
+
+        public async Task<List<SeatWithStatus>> GetSeatsWithAvailability(int zoneId, DateTime start, int duration)
+        {
+            var allSeats = await seatRepository.GetSeatsByZoneIdAsync(zoneId);
+            var end = start.AddMinutes(duration);
+            var bookedSeatIds = await bookingRepository.GetBookedSeatIdsAsync(zoneId, start, end);
+
+            return allSeats.Select(seat => new SeatWithStatus
+            {
+                SeatID = seat.SeatID,
+                SeatNumber = seat.SeatNumber,
+                ZoneID = seat.ZoneID,
+                IsAvailable = seat.IsAvailable,
+                IsAvailableForBooking = !bookedSeatIds.Contains(seat.SeatID)
+            }).ToList();
+        }
+
     }
 }

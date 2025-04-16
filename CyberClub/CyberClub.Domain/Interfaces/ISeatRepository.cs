@@ -10,7 +10,7 @@ namespace CyberClub.Domain.Interfaces
     public interface ISeatRepository
     {
         Task<bool> AddSeatAsync(Seat seat);
-        Task<Seat> FindAvailableSeatAsync();
+        Task<List<Seat>> FindAvailableSeatAsync(int zoneId, DateTime startTime, int duration);
         Task<bool> UpdateSeatAvailabilityAsync(int seatId, bool isAvailable);
         Task<Seat> GetSeatByIdAsync(int seatId);
         Task<List<Seat>> GetSeatsByZoneIdAsync(int zoneId);
