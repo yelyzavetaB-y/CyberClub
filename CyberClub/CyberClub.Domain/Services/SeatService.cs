@@ -1,10 +1,6 @@
 ﻿using CyberClub.Domain.Interfaces;
 using CyberClub.Domain.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace CyberClub.Domain.Services
 {
@@ -12,10 +8,12 @@ namespace CyberClub.Domain.Services
     {
         private readonly ISeatRepository seatRepository;
         private readonly IBookingRepository bookingRepository;
-        public SeatService(ISeatRepository seatRepository, IBookingRepository bookingRepository)
+        private readonly IZoneRepository zoneRepository;
+        public SeatService(ISeatRepository seatRepository, IBookingRepository bookingRepository, IZoneRepository zoneRepository)
         {
             this.seatRepository = seatRepository;
             this.bookingRepository = bookingRepository;
+            this.zoneRepository = zoneRepository;
         }
         public async Task<List<Seat>> GetSeatsByZoneIdAsync(int zoneId)
         {
@@ -41,6 +39,12 @@ namespace CyberClub.Domain.Services
                 IsAvailableForBooking = !bookedSeatIds.Contains(seat.SeatID)
             }).ToList();
         }
+        //public async Task ReleaseSeatsWithEndedBookingsAsync()
+        //{
+        //    await seatRepository.ReleaseSeatsWithEndedBookingsAsync();
+        //}
+
+
 
     }
 }

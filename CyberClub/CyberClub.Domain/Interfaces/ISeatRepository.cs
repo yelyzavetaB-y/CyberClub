@@ -14,6 +14,7 @@ namespace CyberClub.Domain.Interfaces
         Task<bool> UpdateSeatAvailabilityAsync(int seatId, bool isAvailable);
         Task<Seat> GetSeatByIdAsync(int seatId);
         Task<List<Seat>> GetSeatsByZoneIdAsync(int zoneId);
+        Task<int> ReleaseSeatsWithEndedBookingsAsync();
     }
 
 }

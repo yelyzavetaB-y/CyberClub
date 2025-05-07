@@ -9,11 +9,14 @@ namespace CyberClub.Domain.Models
 {
     public class Booking
     {
-        public int Id { get; set; }
+        public int BookingID { get; set; }
         public Status Status { get; set; }
         public int UserId { get; set; }
         public int SeatId { get; set; }
         public DateTime StartTime { get; set; }
         public int Duration { get; set; }
+
+        public Seat? Seat { get; set; }
+        public Zone? Zone { get; set; }
     }
 }

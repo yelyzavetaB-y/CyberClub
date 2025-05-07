@@ -49,11 +49,21 @@ namespace CyberClub.Domain.Services
             bool success = await _bookingRepository.AddBookingAsync(booking);
             if (!success) return false;
 
-            return await _seatRepository.UpdateSeatAvailabilityAsync(seatId, false);
+            bool updated = await _seatRepository.UpdateSeatAvailabilityAsync(seatId, false);
+            Console.WriteLine("🛠 Seat availability update success: " + updated);
+            return updated;
         }
 
 
+        public async Task<List<Booking>> GetBookingsByUserIdAsync(int userId)
+        {
+            return await _bookingRepository.GetBookingsByUserIdAsync(userId);
+        }
 
+        public async Task<bool> CancelBookingAsync(int bookingId)
+        {
+            return await _bookingRepository.CancelBookingAsync(bookingId);
+        }
 
     }
 

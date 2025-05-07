@@ -1,4 +1,6 @@
 ﻿using CyberClub.Domain.Models;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CyberClub.ViewModels
 {
@@ -14,6 +16,10 @@ namespace CyberClub.ViewModels
 
         public DateTime SelectedDate { get; set; }
         public TimeSpan SelectedTime { get; set; }
+
+        [DisplayFormat(DataFormatString = @"{0:hh\:mm}", ApplyFormatInEditMode = true)]
+        public string? SelectedTimeRaw { get; set; }
+
         public int Duration { get; set; } 
 
         public bool ShowSeats => Seats != null && Seats.Any();

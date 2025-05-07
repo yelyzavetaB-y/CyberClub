@@ -1,0 +1,42 @@
+﻿@model List<CyberClub.Domain.Models.Seat>
+
+<div class="seat-map" id="seat-map-container"></div>
+
+<style>
+    .seat-map {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+        gap: 10px;
+        padding: 20px;
+    }
+
+    .seat {
+        height: 60px;
+        background-color: #ccc;
+        color: #fff;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        transition: transform 0.2s ease;
+        cursor: pointer;
+    }
+
+        .seat.available {
+            background-color: #4caf50;
+        }
+
+        .seat.unavailable {
+            background-color: #f44336;
+            cursor: not-allowed;
+        }
+
+        .seat.available.selected {
+            background-color: #2196f3 !important;
+        }
+
+        .seat:hover {
+            transform: scale(1.05);
+        }
+</style>

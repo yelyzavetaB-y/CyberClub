@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CyberClub.Domain", "CyberCl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "UnitTests\UnitTests.csproj", "{4BAAC786-4444-4DAC-8705-1ED1E5893B61}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CyberClub.Api", "CyberClub.Api\CyberClub.Api.csproj", "{ED70B966-4E4F-4D1D-9AEE-5618242BCCD8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{4BAAC786-4444-4DAC-8705-1ED1E5893B61}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4BAAC786-4444-4DAC-8705-1ED1E5893B61}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4BAAC786-4444-4DAC-8705-1ED1E5893B61}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED70B966-4E4F-4D1D-9AEE-5618242BCCD8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED70B966-4E4F-4D1D-9AEE-5618242BCCD8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED70B966-4E4F-4D1D-9AEE-5618242BCCD8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED70B966-4E4F-4D1D-9AEE-5618242BCCD8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

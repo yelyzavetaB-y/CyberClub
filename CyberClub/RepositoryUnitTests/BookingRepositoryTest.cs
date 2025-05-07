@@ -4,12 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CyberClub.Domain.Models.Enum
+namespace RepositoryUnitTests
 {
-    public enum Status
+    internal class BookingRepositoryTest
     {
-        Confirmed,
-        Modified,
-        Cancelled
     }
 }

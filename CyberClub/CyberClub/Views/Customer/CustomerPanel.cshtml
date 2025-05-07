@@ -1,147 +1,87 @@
-﻿@{
+﻿@model CyberClub.ViewModels.BookingViewModel
+@{
     Layout = "~/Views/Customer/_CustomerLayout.cshtml";
 }
-<h2>Seat Map</h2>
-<p>Welcome to the customer panel!</p>
+
+<h2 class="text-white">Choose a seat</h2>
+
+@if (Model?.Seats?.Any() == true)
+{
+    @(await Component.InvokeAsync("SeatMap", new { seats = Model.Seats }))
+}
+else
+{
+    <p class="text-warning">Choose date, time, duration and zone to see available seats.</p>
+}
 
 
-<!-- DEMO SEAT MAP START (for testing only) -->
-<style>
 
-    .zone {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 10px;
-        padding: 15px;
-        background: #1e1e1e;
-        border-radius: 10px;
-        box-shadow: 0 0 8px rgba(0,0,0,0.3);
-        align-content: start;
-        min-width: 600px;
-    }
 
-    .zone-title {
-        grid-column: span 4;
-        text-align: center;
-        font-weight: bold;
-        margin-bottom: 10px;
-    }
 
-    .seat {
-        height: 50px;
-        background-color: #4caf50;
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-        font-size: 12px;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        user-select: none;
-        transform: scale(1);
-    }
+@section Scripts {
+    <script>
+        async function fetchSeats() {
+            const zoneId = document.querySelector('[name="SelectedZoneId"]')?.value;
+            const date = document.querySelector('[name="SelectedDate"]')?.value;
+            const time = document.querySelector('[name="SelectedTime"]')?.value;
+            const duration = document.querySelector('[name="Duration"]')?.value;
 
-        .seat.booked {
-            background-color: #f44336;
-            cursor: not-allowed;
-            opacity: 0.6;
-        }
-
-        .seat.selected {
-            background-color: #ffd700 !important;
-            color: #000;
-            transform: scale(1.05);
-        }
-
-        .seat:hover:not(.booked):not(.selected) {
-            background-color: #66bb6a;
-            transform: scale(1.03);
-        }
-
-    .console-zone .seat {
-        background-color: #673ab7;
-    }
-
-        .console-zone .seat.selected {
-            background-color: #d1c4e9 !important;
-            color: #000;
-        }
-</style>
-
-<div class="zone" id="zoneVip">
-    <div class="zone-title">VIP Zone</div>
-</div>
-<div class="zone" id="zonePro">
-    <div class="zone-title">Pro Zone</div>
-</div>
-<div class="zone console-zone" id="zoneConsoles">
-    <div class="zone-title">Console Zone</div>
-</div>
-
-<!-- DEMO SEAT MAP END -->
-<script>
-    document.addEventListener("DOMContentLoaded", () => {
-        const dateInput = document.querySelector('[name="SelectedDate"]');
-        const timeInput = document.querySelector('[name="SelectedTime"]');
-        const durationInput = document.querySelector('[name="Duration"]');
-        const zoneInput = document.querySelector('[name="SelectedZoneId"]');
-
-        function getZoneContainerId(zoneId) {
-            switch (parseInt(zoneId)) {
-                case 1: return 'zoneVip';
-                case 2: return 'zonePro';
-                case 3: return 'zoneConsoles';
-                default: return 'zoneVip';
+            if (!zoneId || !date || !time || !duration) {
+                console.warn("Missing data");
+                return;
             }
-        }
 
-        function tryLoadSeats() {
-            const date = dateInput.value;
-            const time = timeInput.value;
-            const duration = durationInput.value;
-            const zoneId = zoneInput.value;
+            const startTime = `${date} ${time}:00`;
 
-            if (date && time && duration && zoneId) {
-                const startTime = `${date}T${time}`;
-                const containerId = getZoneContainerId(zoneId);
-                console.log("Calling loadSeats with:", { zoneId, startTime, duration, containerId });
-                loadSeats(zoneId, startTime, duration, containerId);
-            } else {
-                console.log("Not enough data to load seats");
-            }
-        }
+            try {
+                const response = await fetch(`/Customer/GetSeatsByZone?zoneId=${zoneId}&startTime=${encodeURIComponent(startTime)}&duration=${duration}`);
+                if (!response.ok) {
+                    console.error("❌ Failed to load seats:", response.status);
+                    return;
+                }
 
-        // Підключаємо до кожного поля
-        dateInput?.addEventListener("change", tryLoadSeats);
-        timeInput?.addEventListener("change", tryLoadSeats);
-        durationInput?.addEventListener("change", tryLoadSeats);
-        zoneInput?.addEventListener("change", tryLoadSeats);
-    });
+                const data = await response.json();
+                const seatMapContainer = document.getElementById("seat-map-container");
+                seatMapContainer.innerHTML = "";
 
-    async function loadSeats(zoneId, startTime, duration, containerId) {
-        const res = await fetch(`/Booking/GetSeatMap?zoneId=${zoneId}&startTime=${startTime}&duration=${duration}`);
-        const seats = await res.json();
+                if (data.length === 0) {
+                    seatMapContainer.innerHTML = "<p>No seats available.</p>";
+                    return;
+                }
 
-        const container = document.getElementById(containerId);
-        container.innerHTML = '';
+                data.forEach(seat => {
+                    const div = document.createElement("div");
+                    div.classList.add("seat");
+                    div.textContent = seat.seatNumber;
 
-        seats.forEach(seat => {
-            const div = document.createElement('div');
-            div.classList.add('seat');
-            div.textContent = seat.seatNumber;
+                    if (seat.isAvailable) {
+                        div.classList.add("available");
+                        div.dataset.seatId = seat.seatID;
 
-            if (!seat.isAvailableForBooking) {
-                div.classList.add('booked');
-            } else {
-                div.addEventListener('click', () => {
-                    document.querySelectorAll('.seat.selected').forEach(s => s.classList.remove('selected'));
-                    div.classList.add('selected');
-                    document.getElementById('SelectedSeatId').value = seat.seatID;
+                        div.addEventListener("click", () => {
+                            document.querySelectorAll(".seat.available.selected").forEach(s => s.classList.remove("selected"));
+                            div.classList.add("selected");
+                            document.getElementById("SelectedSeatId").value = seat.seatID;
+                        });
+                    } else {
+                        div.classList.add("unavailable");
+                    }
+
+                    seatMapContainer.appendChild(div);
                 });
-            }
 
-            container.appendChild(div);
+            } catch (err) {
+                console.error("❌ fetchSeats error:", err);
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            ["SelectedZoneId", "SelectedDate", "SelectedTime", "Duration"].forEach(id => {
+                const el = document.querySelector(`[name="${id}"]`);
+                if (el) el.addEventListener("change", fetchSeats);
+            });
         });
-    }
-</script>
+    </script>
+
+
+}

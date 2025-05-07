@@ -31,35 +31,21 @@ namespace CyberClub.Infrastructure.Repositories
             int seatId = await _queryBuilder.ExecuteScalarAsync<int>(query, parameters);
             return seatId > 0;
         }
-        
+
 
 
         public async Task<List<Seat>> FindAvailableSeatAsync(int zoneId, DateTime startTime, int duration)
         {
-            DateTime endTime = startTime.AddMinutes(duration);
-            const string query = @"SELECT s.SeatID, s.SeatNumber
-    FROM Seat s
-    WHERE s.ZoneID = @ZoneID
-     AND s.IsAvailable = 1
-     AND NOT EXISTS (
-      SELECT 1
-      FROM Booking b
-      WHERE b.SeatID = s.SeatID
-        AND b.Status = 'Confirmed' 
-        AND (
-            @StartTime < DATEADD(MINUTE, b.Duration, b.StartTime)
-            AND @EndTime > b.StartTime
-        )
-  )
-ORDER BY s.SeatNumber;";
+            const string query = @"
+        SELECT s.SeatID, s.SeatNumber
+        FROM Seat s
+        WHERE s.ZoneID = @ZoneID
+          AND s.IsAvailable = 1
+        ORDER BY s.SeatNumber;";
 
-            SqlParameter[] parameters =
-            {
-               new SqlParameter("@ZoneID", zoneId),
-                new SqlParameter("@StartTime", startTime),
-                new SqlParameter("@EndTime", endTime)
-
-            };
+            SqlParameter[] parameters = {
+        new SqlParameter("@ZoneID", zoneId)
+    };
 
             List<Seat> seats = new();
 
@@ -70,31 +56,34 @@ ORDER BY s.SeatNumber;";
                     seats.Add(new Seat
                     {
                         SeatID = reader.GetInt32(reader.GetOrdinal("SeatID")),
-                        SeatNumber = reader.GetString(reader.GetOrdinal("SeatNumber"))
+                        SeatNumber = reader.GetString(reader.GetOrdinal("SeatNumber")),
+                        IsAvailable = true
                     });
                 }
             }, parameters);
 
             return seats;
         }
-        
+
+
         public async Task<bool> UpdateSeatAvailabilityAsync(int seatId, bool isAvailable)
         {
             const string query = "UPDATE Seat SET IsAvailable = @IsAvailable WHERE SeatID = @SeatID";
 
             var parameters = new[]
             {
-            new SqlParameter("@IsAvailable", isAvailable),
-            new SqlParameter("@SeatID", seatId)
-        };
+        new SqlParameter("@IsAvailable", isAvailable),
+        new SqlParameter("@SeatID", seatId)
+    };
 
             int rowsAffected = await _queryBuilder.ExecuteQueryAsync(query, parameters);
             return rowsAffected > 0;
         }
 
+
         public async Task<Seat> GetSeatByIdAsync(int seatId)
         {
-            const string query = @"SELECT SeatID, SeatNumber, ZoneID, IsAvailable, StartTime
+            const string query = @"SELECT SeatID, SeatNumber, ZoneID, IsAvailable
                                FROM Seat WHERE SeatID = @SeatID";
 
             var parameters = new[]
@@ -117,7 +106,7 @@ ORDER BY s.SeatNumber;";
 
         public async Task<List<Seat>> GetSeatsByZoneIdAsync(int zoneId)
         {
-            const string query = @"SELECT SeatID, SeatNumber, ZoneID, IsAvailable, StartTime
+            const string query = @"SELECT SeatID, SeatNumber, ZoneID, IsAvailable
                                FROM Seat WHERE ZoneID = @ZoneID";
 
             var parameters = new[]
@@ -149,6 +138,23 @@ ORDER BY s.SeatNumber;";
                
             };
         }
+
+        public async Task<int> ReleaseSeatsWithEndedBookingsAsync()
+        {
+            const string query = @"
+        UPDATE Seat
+        SET IsAvailable = 1
+        WHERE SeatID IN (
+            SELECT b.SeatID
+            FROM Booking b
+            WHERE b.Status = 'Confirmed'
+              AND DATEADD(MINUTE, b.Duration, b.StartTime) <= GETDATE()
+        );";
+
+            return await _queryBuilder.ExecuteQueryAsync(query);
+        }
+
+
     }
 
 }

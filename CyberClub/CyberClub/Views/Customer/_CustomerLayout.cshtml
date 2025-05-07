@@ -1,4 +1,7 @@
-﻿@model CyberClub.ViewModels.BookingViewModel
+﻿@using CyberClub.Domain.Models
+@using CyberClub.Domain.Services
+@using CyberClub.ViewModels
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -15,7 +18,7 @@
     <link rel="shortcut icon" href="~/assets/images/favicon.svg" />
 
     <!-- *************
-            ************ CSS Files *************
+            ************ CSS Files ************* CCCCCC
         ************* -->
     <link rel="stylesheet" href="~/assets/fonts/bootstrap/bootstrap-icons.css" />
     <link rel="stylesheet" href="~/assets/css/main.min.css" />
@@ -40,103 +43,13 @@
 
                 <!-- App brand starts -->
                 <div class="app-brand mb-3">
-                    <a href="index.html">
+                    <a href="/Customer/Panel">
                         <img src="~/assets/images/logo.svg" class="logo" alt="CyberClub" />
                     </a>
                 </div>
                 <!-- App brand ends -->
                 <!-- Sidebar menu starts -->
-
-                <div class="sidebarMenuScroll">
-                    <form asp-action="UpdateBooking" method="post">
-                        <ul class="sidebar-menu">
-
-                            @* <li class="active current-page">
-                                <a href="/Customer/Panel">
-                                    <i class="bi bi-laptop"></i>
-                                    <span class="menu-text">Analytics</span>
-                                </a>
-                            </li> *@
-
-                            @if (Model is CyberClub.ViewModels.BookingViewModel booking)
-                            {
-                                <li class="treeview">
-                                    <a href="#">
-                                        <i class="bi bi-ui-checks-grid"></i>
-                                        <span class="menu-text">Choose a slot</span>
-                                    </a>
-                                    <ul class="treeview-menu">
-                                        <li>
-                                            <label>Date:</label>
-                                            <input asp-for="SelectedDate" type="date" class="form-control" />
-                                        </li>
-                                        <li>
-                                            <label>Time:</label>
-                                            <input asp-for="SelectedTime" type="time" class="form-control" />
-                                        </li>
-                                        <li>
-                                            <label>Duration (minutes):</label>
-                                            <input asp-for="Duration" type="number" class="form-control" min="30" step="30" />
-                                        </li>
-                                    </ul>
-                                </li>
-
-                                <li class="treeview">
-                                    <a href="#">
-                                        <i class="bi bi-ui-checks-grid"></i>
-                                        <span class="menu-text">Choose a Zone</span>
-                                    </a>
-                                    <ul class="treeview-menu">
-                                        <li>
-                                            <label>Select Zone:</label>
-                                            <select class="form-control" asp-for="SelectedZoneId" onchange="this.form.submit();">
-                                                <option value="">Please choose</option>
-                                                @foreach (var zone in booking.Zones)
-                                                {
-                                                    <option value="@zone.ZoneID">@zone.Name</option>
-                                                }
-                                            </select>
-                                        </li>
-                                    </ul>
-                                </li>
-
-                              
-                                <li class="treeview">
-                                    <a href="#">
-                                        <i class="bi bi-person-check"></i>
-                                        <span class="menu-text">Choose a Seat</span>
-                                    </a>
-                                    <ul class="treeview-menu" id="seatList" style="@(booking.Seats != null && booking.Seats.Any() ? "" : "display:none;")">
-                                        @if (booking.Seats != null && booking.Seats.Any())
-                                        {
-                                            foreach (var seat in booking.Seats)
-                                            {
-                                                <li>
-                                                    <label>
-                                                        <input type="radio" name="SelectedSeatId" value="@seat.SeatID" />
-                                                        @seat.SeatNumber
-                                                    </label>
-                                                </li>
-                                            }
-                                        }
-                                        else
-                                        {
-                                            <li>No seats available.</li>
-                                        }
-                                    </ul>
-                                </li>
-                            }
-
-                          
-                            <li>
-                                <input type="hidden" name="UserID" value="@Context.Session.GetInt32("UserID")" />
-                                <input type="hidden" name="SelectedSeatId" id="SelectedSeatId" />
-                                <button type="submit" formaction="/Customer/FinalizeBooking" class="btn btn-primary mt-3 w-100">Book Now</button>
-                            </li>
-
-                        </ul>
-                    </form>
-                </div>
+                @(await Component.InvokeAsync("Zone"))
                 <!-- Sidebar settings ends -->
 
             </nav>
@@ -156,7 +69,7 @@
                     <!-- Toggle buttons ends -->
                     <!-- App brand sm starts -->
                     <div class="app-brand-sm d-lg-none d-flex">
-                        <a href="index.html">
+                        <a href="/Customer/Panel">
                             <img src="~/assets/images/logo-sm.svg" class="logo" alt="CyberClub" />
                         </a>
                     </div>
@@ -174,22 +87,25 @@
                             <input type="text" class="form-control" id="searchData" placeholder="Search" />
                             <i class="bi bi-search"></i>
                         </div>
-                     
+
                         <!-- Header list starts -->
                         <!-- User settings starts -->
                         <div class="dropdown ms-4">
                             <a id="userSettings" class="dropdown-toggle d-flex py-2 align-items-center" href="index.html#!" role="button"
                                data-bs-toggle="dropdown" aria-expanded="false">
-                                <img src="~/assets/images/user.png" class="rounded-4 img-3x" alt="CyberClub" />
+                                @*   <img src="~/assets/images/user.png" class="rounded-4 img-3x" alt="CyberClub" /> *@
                                 <div class="ms-2 text-truncate d-lg-flex flex-column d-none">
                                     <p class="text-truncate m-0">@Context.Session.GetString("User")</p>
                                     <span class="small opacity-50 lh-1">@Context.Session.GetString("Role")</span>
                                 </div>
                             </a>
                             <div class="dropdown-menu dropdown-menu-end shadow-lg">
-                                <a class="dropdown-item d-flex align-items-center" href="profile.html">
-                                    <i class="bi bi-person fs-5 me-2"></i>My Profile
+                                <a class="dropdown-item d-flex align-items-center"
+                                   asp-controller="Booking"
+                                   asp-action="MyBookings">
+                                    <i class="bi bi-person fs-5 me-2"></i>My Bookings
                                 </a>
+
                                 <a class="dropdown-item d-flex align-items-center" asp-controller="Customer" asp-action="Settings" class="btn btn-primary">
                                     <i class="bi bi-gear fs-5 me-2"></i>Settings
                                 </a>
@@ -217,11 +133,12 @@
                 <!-- App body starts -->
                 <div class="app-body">
                     @RenderBody()
+                    @(await Component.InvokeAsync("SeatMap"))
+
+
 
                     <div class="col-xl-4 col-sm-6">
                         <div class="card mb-4">
-                          
-                            
                         </div>
                     </div>
                 </div>
@@ -244,8 +161,9 @@
             <!-- App footer ends -->
             @if (IsSectionDefined("Scripts"))
             {
-                @RenderSection("/", required: false)
+                @RenderSection("Scripts", required: false)
             }
+
         </div>
         <!-- App container ends -->
 
@@ -258,30 +176,6 @@
              ************ JavaScript Files *************
          ************* -->
 
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const dateInput = document.querySelector('[name="SelectedDate"]');
-
-            dateInput.addEventListener("change", () => {
-                // Перевіримо, що є й інші дані
-                const zoneId = document.querySelector('[name="SelectedZoneId"]').value;
-                const time = document.querySelector('[name="SelectedTime"]').value;
-                const duration = document.querySelector('[name="Duration"]').value;
-
-                if (zoneId && time && duration) {
-                    loadCurrentZone(); // Завантажуємо мапу сидінь
-                    showSeatMap();     // Робимо блок мапи видимим
-                }
-            });
-        });
-
-        function showSeatMap() {
-            document.getElementById('zoneVip').style.display = 'grid';
-            document.getElementById('zonePro').style.display = 'grid';
-            document.getElementById('zoneConsoles').style.display = 'grid';
-        }
-    </script>
 
 
     <!-- Required jQuery first, then Bootstrap Bundle JS -->
