@@ -20,18 +20,13 @@ namespace CyberClub.Domain.Services
             _seatRepository = seatRepository;
         }
 
-        public async Task<bool> BookAvailableSeatAsync(int userId, DateTime startTime, int zoneId, int durarion)
-        {
-            return await _bookingRepository.BookAvailableSeatAsync(userId, startTime, zoneId, durarion);
-        }
-
-        public async Task<bool> AddBookingAsync(Booking booking)
-        {
-            return await _bookingRepository.AddBookingAsync(booking);
-        }
         public async Task<bool> BookSeatAsync(int seatId, int userId, DateTime startTime, int durationMinutes)
         {
             var seat = await _seatRepository.GetSeatByIdAsync(seatId);
+            if(seat == null)
+            {
+                return false;
+            }
             var availableSeats = await _seatRepository.FindAvailableSeatAsync(seat.ZoneID, startTime, durationMinutes);
             bool stillAvailable = availableSeats.Any(s => s.SeatID == seatId);
             if (!stillAvailable)
@@ -48,21 +43,26 @@ namespace CyberClub.Domain.Services
 
             bool success = await _bookingRepository.AddBookingAsync(booking);
             if (!success) return false;
+        
 
             bool updated = await _seatRepository.UpdateSeatAvailabilityAsync(seatId, false);
-            Console.WriteLine("🛠 Seat availability update success: " + updated);
+           
             return updated;
         }
 
-
-        public async Task<List<Booking>> GetBookingsByUserIdAsync(int userId)
+        public async Task<List<Booking>> GetBookingsByUserIdAsync(int userId, bool includeCancelled = false)
         {
-            return await _bookingRepository.GetBookingsByUserIdAsync(userId);
+            return await _bookingRepository.GetBookingsByUserIdAsync(userId, includeCancelled);
         }
+
 
         public async Task<bool> CancelBookingAsync(int bookingId)
         {
             return await _bookingRepository.CancelBookingAsync(bookingId);
+        }
+        public async Task<int> DeleteExpiredBookingsAsync()
+        {
+            return await _bookingRepository.DeleteExpiredBookingsAsync();
         }
 
     }

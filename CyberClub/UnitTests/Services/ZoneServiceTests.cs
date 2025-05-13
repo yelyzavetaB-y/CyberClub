@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RepositoryUnitTests
+namespace UnitTests.Services
 {
-    internal class BookingRepositoryTest
+    internal class ZoneServiceTests
     {
     }
 }

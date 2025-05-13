@@ -11,6 +11,7 @@ namespace CyberClub.Infrastructure.Repositories
     {
         private readonly QueryBuilder _queryBuilder;
         private readonly ISeatRepository _seatRepository;
+
         public BookingRepository(QueryBuilder queryBuilder)
         {
             _queryBuilder = queryBuilder;
@@ -18,6 +19,21 @@ namespace CyberClub.Infrastructure.Repositories
 
         public async Task<bool> AddBookingAsync(Booking booking)
         {
+            if (booking == null)
+                throw new ArgumentNullException(nameof(booking));
+
+            if (booking.UserId <= 0)
+                throw new ArgumentException("Invalid UserId");
+
+            if (booking.SeatId <= 0)
+                throw new ArgumentException("Invalid SeatId");
+
+            if (booking.StartTime < DateTime.Now)
+                throw new ArgumentException("Start time cannot be in the past");
+
+            if (booking.Duration <= 0)
+                throw new ArgumentException("Duration must be a positive value");
+
             string query = @"
     INSERT INTO Booking (UserID, SeatID, Status, StartTime, Duration)
     VALUES (@UserID, @SeatID, @Status, @StartTime, @Duration);
@@ -83,21 +99,27 @@ WHERE s.ZoneID = @ZoneId
             return bookedSeats;
         }
 
-        public async Task<List<Booking>> GetBookingsByUserIdAsync(int userId)
+        public async Task<List<Booking>> GetBookingsByUserIdAsync(int userId, bool includeCancelled = false)
         {
             List<Booking> bookings = new();
 
             string query = @"
         SELECT b.BookingID, b.SeatID, b.UserID, b.StartTime, b.Duration, b.Status,
-       s.SeatNumber, z.Name as ZoneName
-  FROM Booking b
-  JOIN Seat s ON s.SeatID = b.SeatID
-  JOIN Zone z ON z.ZoneID = s.ZoneID
-  WHERE b.UserID = @UserID
-  ORDER BY b.StartTime DESC";
+               s.SeatNumber, z.Name as ZoneName
+        FROM Booking b
+        JOIN Seat s ON s.SeatID = b.SeatID
+        JOIN Zone z ON z.ZoneID = s.ZoneID
+        WHERE b.UserID = @UserID";
+                
+            if (!includeCancelled)
+            {
+                query += " AND b.Status != 'Cancelled'";
+            }
+
+            query += " ORDER BY b.StartTime DESC";
 
             SqlParameter[] parameters = {
-        new SqlParameter("@UserId", userId)
+        new SqlParameter("@UserID", userId)
     };
 
             await _queryBuilder.ExecuteQueryAsync(query, reader =>
@@ -122,8 +144,7 @@ WHERE s.ZoneID = @ZoneId
                         UserId = reader.GetInt32(reader.GetOrdinal("UserID")),
                         StartTime = reader.GetDateTime(reader.GetOrdinal("StartTime")),
                         Duration = reader.GetInt32(reader.GetOrdinal("Duration")),
-                        Status = Enum.Parse<Status>(reader.GetString(reader.GetOrdinal("Status")))
-                        ,
+                        Status = Enum.Parse<Status>(reader.GetString(reader.GetOrdinal("Status"))),
                         Seat = seat,
                         Zone = zone
                     });
@@ -133,17 +154,109 @@ WHERE s.ZoneID = @ZoneId
             return bookings;
         }
 
+
         public async Task<bool> CancelBookingAsync(int bookingId)
         {
-            const string query = @"UPDATE Booking SET Status = @Status WHERE BookingID = @BookingID";
+            if (bookingId <= 0)
+                throw new ArgumentException("Invalid booking ID");
 
-            SqlParameter[] parameters = {
-        new SqlParameter("@Status", Status.Cancelled.ToString()),
-        new SqlParameter("@BookingID", bookingId)
+            try
+            {
+                const string getSeatQuery = @"SELECT SeatID FROM Booking WHERE BookingID = @BookingID";
+                var getSeatParam = new SqlParameter("@BookingID", bookingId);
+
+                object result = await _queryBuilder.ExecuteScalarAsync<object>(getSeatQuery, getSeatParam);
+
+                if (result == null || result == DBNull.Value)
+                {
+                    Console.WriteLine($"No booking found with ID: {bookingId}");
+                    return false;
+                }
+
+                int seatId = Convert.ToInt32(result);
+
+                const string cancelBookingQuery = @"UPDATE Booking SET Status = @Status WHERE BookingID = @BookingID";
+
+                SqlParameter[] cancelParams = {
+            new SqlParameter("@Status", Status.Cancelled.ToString()),
+            new SqlParameter("@BookingID", bookingId)
+        };
+
+                int bookingRowsAffected = await _queryBuilder.ExecuteQueryAsync(cancelBookingQuery, cancelParams);
+                if (bookingRowsAffected == 0)
+                {
+                    Console.WriteLine($"Booking status update failed for BookingID: {bookingId}");
+                    return false;
+                }
+
+                const string updateSeatQuery = @"UPDATE Seat SET IsAvailable = 1 WHERE SeatID = @SeatID";
+                SqlParameter[] seatParams = {
+            new SqlParameter("@SeatID", seatId)
+        };
+
+                int seatRowsAffected = await _queryBuilder.ExecuteQueryAsync(updateSeatQuery, seatParams);
+
+                return seatRowsAffected > 0;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception while cancelling booking ID {bookingId}: {ex.Message}");
+                return false;
+            }
+        }
+
+
+        public async Task<List<Booking>> GetBookingsForZoneAndTimeAsync(int zoneId, DateTime startTime, int durationMinutes)
+        {
+            var endTime = startTime.AddMinutes(durationMinutes);
+
+            const string query = @"
+        SELECT b.*
+        FROM Booking b
+        JOIN Seat s ON s.SeatID = b.SeatID
+        WHERE s.ZoneID = @ZoneID
+          AND b.Status = 'Confirmed'
+          AND NOT (
+              DATEADD(MINUTE, b.Duration, b.StartTime) <= @StartTime
+              OR b.StartTime >= @EndTime
+          )";
+
+            var parameters = new[]
+            {
+        new SqlParameter("@ZoneID", zoneId),
+        new SqlParameter("@StartTime", startTime),
+        new SqlParameter("@EndTime", endTime)
     };
 
-            int rowsAffected = await _queryBuilder.ExecuteQueryAsync(query, parameters);
-            return rowsAffected > 0;
+            var bookings = new List<Booking>();
+
+            await _queryBuilder.ExecuteQueryAsync(query, reader =>
+            {
+                while (reader.Read())
+                {
+                    bookings.Add(new Booking
+                    {
+                        BookingID = reader.GetInt32(reader.GetOrdinal("BookingID")),
+                        SeatId = reader.GetInt32(reader.GetOrdinal("SeatID")),
+                        StartTime = reader.GetDateTime(reader.GetOrdinal("StartTime")),
+                        Duration = reader.GetInt32(reader.GetOrdinal("Duration")),
+                        Status = Enum.Parse<Status>(reader.GetString(reader.GetOrdinal("Status")))
+                    });
+                }
+            }, parameters);
+
+            return bookings;
+        }
+
+        public async Task<int> DeleteExpiredBookingsAsync()
+        {
+            string query = @"
+        DELETE FROM Booking
+        WHERE Status = 'Confirmed'
+        AND DATEADD(MINUTE, Duration, StartTime) < @Now";
+
+            var parameters = new[] { new SqlParameter("@Now", DateTime.Now) };
+            return await _queryBuilder.ExecuteQueryAsync(query, parameters);
         }
 
 

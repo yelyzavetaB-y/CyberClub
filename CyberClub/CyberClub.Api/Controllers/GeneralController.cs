@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using CyberClub.Api.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using System.Threading.Tasks;
@@ -9,28 +10,20 @@ namespace CyberClub.Api.Controllers
     [ApiController]
     public class GeneralController : ControllerBase
     {
-        private readonly IConfiguration _configuration;
-
-        public GeneralController(IConfiguration configuration)
+        private readonly IBookingService _bookingService;
+        public GeneralController(IBookingService bookingService)
         {
-            _configuration = configuration;
+            _bookingService = bookingService;
         }
+
+        //https://localhost:44358/api/general/updateExpiredBookingsSeats/d123d2378dg287dg23d78g
 
         [HttpGet("updateExpiredBookingsSeats/{key}")]
         public async Task<IActionResult> UpdateExpiredBookingsSeats(string key)
         {
-            //https://localhost:44358/api/general/updateExpiredBookingsSeats/d123d2378dg287dg23d78g
-            if (key.Equals("d123d2378dg287dg23d78g"))
+            if (key.Equals("d123d2378dg287dg23d78g", StringComparison.OrdinalIgnoreCase))
             {
-                using (SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                {
-                    connection.Open();
-                    using (SqlCommand command = new SqlCommand("UpdateExpiredBookingsSeats", connection))
-                    {
-                        command.CommandType = System.Data.CommandType.StoredProcedure;
-                        await command.ExecuteNonQueryAsync();
-                    }
-                }
+                await _bookingService.UpdateExpiredBookingsSeatsAsync();
                 return Ok();
             }
             else

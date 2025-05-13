@@ -37,11 +37,11 @@ namespace CyberClub.Infrastructure.Repositories
         public async Task<List<Seat>> FindAvailableSeatAsync(int zoneId, DateTime startTime, int duration)
         {
             const string query = @"
-        SELECT s.SeatID, s.SeatNumber
-        FROM Seat s
-        WHERE s.ZoneID = @ZoneID
-          AND s.IsAvailable = 1
-        ORDER BY s.SeatNumber;";
+    SELECT s.SeatID, s.SeatNumber, s.IsAvailable
+    FROM Seat s
+    WHERE s.ZoneID = @ZoneID
+      AND s.IsAvailable = 1
+    ORDER BY s.SeatNumber;";
 
             SqlParameter[] parameters = {
         new SqlParameter("@ZoneID", zoneId)
@@ -57,13 +57,14 @@ namespace CyberClub.Infrastructure.Repositories
                     {
                         SeatID = reader.GetInt32(reader.GetOrdinal("SeatID")),
                         SeatNumber = reader.GetString(reader.GetOrdinal("SeatNumber")),
-                        IsAvailable = true
+                        IsAvailable = reader.GetBoolean(reader.GetOrdinal("IsAvailable"))
                     });
                 }
             }, parameters);
 
             return seats;
         }
+
 
 
         public async Task<bool> UpdateSeatAvailabilityAsync(int seatId, bool isAvailable)

@@ -1,5 +1,6 @@
 ﻿using CyberClub.Domain.Interfaces;
 using CyberClub.Domain.Models;
+using CyberClub.Domain.Models.Enum;
 
 
 namespace CyberClub.Domain.Services
@@ -44,6 +45,24 @@ namespace CyberClub.Domain.Services
         //    await seatRepository.ReleaseSeatsWithEndedBookingsAsync();
         //}
 
+        public async Task<List<Seat>> GetSeatsWithAvailabilityAsync(int zoneId, DateTime startTime, int durationMinutes)
+        {
+            
+            var allSeats = await seatRepository.GetSeatsByZoneIdAsync(zoneId);
+            var activeBookings = await bookingRepository.GetBookingsForZoneAndTimeAsync(zoneId, startTime, durationMinutes);
+
+            var occupiedSeatIds = activeBookings
+                .Where(b => b.Status == Status.Confirmed)
+                .Select(b => b.SeatId)
+                .ToHashSet();
+
+            foreach (var seat in allSeats)
+            {
+                seat.IsAvailable = !occupiedSeatIds.Contains(seat.SeatID);
+            }
+
+            return allSeats;
+        }
 
 
     }

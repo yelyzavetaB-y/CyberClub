@@ -20,9 +20,9 @@ namespace CyberClub.ViewModels
         [DisplayFormat(DataFormatString = @"{0:hh\:mm}", ApplyFormatInEditMode = true)]
         public string? SelectedTimeRaw { get; set; }
 
-        public int Duration { get; set; } 
+        public int Duration { get; set; }
+        public List<ZoneWithSeatsViewModel> ZonesWithSeats { get; set; } = new();
 
-        public bool ShowSeats => Seats != null && Seats.Any();
     }
 
 

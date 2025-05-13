@@ -29,7 +29,7 @@
                 <td>@booking.StartTime.ToString("HH:mm")</td>
                 <td>@booking.ZoneName</td>
                 <td>@booking.SeatNumber</td>
-                <td>@booking.Duration хв</td>
+                <td>@booking.Duration minutes</td>
                 <td>@booking.Status</td>
                 <td>
                   @if (booking.Status == "Confirmed")
@@ -85,7 +85,7 @@
             const button = event.relatedTarget;
             const bookingId = button.getAttribute('data-id');
             const form = document.getElementById('cancelForm');
-            form.setAttribute('action', `/Customer/CancelBooking/${bookingId}`);
+            form.setAttribute('action', `/Booking/CancelBooking/${bookingId}`);
         });
     </script>
 }

@@ -25,5 +25,7 @@ namespace CyberClub.ViewModels
         public DateTime? DOB { get; set; }
 
         public int RoleId { get; set; } = 1;
+
+
     }
 }

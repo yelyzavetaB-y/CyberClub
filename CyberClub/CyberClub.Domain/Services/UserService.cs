@@ -75,6 +75,7 @@ namespace CyberClub.Domain.Services
 
             string salt = SecurityHelper.GenerateSalt(70);
             string hashedPassword = SecurityHelper.HashPassword(user.HashPassword, salt, 10101, 70);
+            
 
             user.HashPassword = hashedPassword;
             user.Salt = salt;
@@ -88,6 +89,7 @@ namespace CyberClub.Domain.Services
             if (user != null)
             {
                 string hashedPassword = SecurityHelper.HashPassword(password, user.Salt, 10101, 70);
+               
                 if (hashedPassword == user.HashPassword)
                 {
                     return user;

@@ -1,4 +1,5 @@
 using CyberClub.Domain.Interfaces;
+using CyberClub.Domain.Models;
 using CyberClub.Domain.Services;
 using CyberClub.Infrastructure.DBService;
 using CyberClub.Infrastructure.Interfaces;
@@ -20,12 +21,6 @@ builder.Services.AddScoped<SeatService>();
 builder.Services.AddScoped<IBookingRepository, BookingRepository>();
 builder.Services.AddScoped<BookingService>();
 builder.Services.AddControllersWithViews();
-//builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-//    .AddCookie(options =>
-//    {
-//        options.LoginPath = "/Auth/SignUp"; 
-//        options.AccessDeniedPath = "/Auth/AccessDenied"; 
-//    });
 builder.Services.AddSession();
 
 var app = builder.Build();
@@ -48,4 +43,32 @@ app.MapControllerRoute(
     name: "default",
   pattern: "{controller=Home}/{action=Index}/{id?}");
 
+using (var scope = app.Services.CreateScope())
+{
+    var userService = scope.ServiceProvider.GetRequiredService<UserService>();
+
+    var existing = await userService.FindByEmailAsync("manager@cyberclub.com");
+
+    if (existing == null)
+    {
+        var managerUser = new User
+        {
+            Email = "manager@cyberclub.com",
+            FullName = "Manager",
+            HashPassword = "Manager123",
+            RoleId = 2,
+            Profile = new UserProfile
+            {
+                PhoneNumber = "+380987541657",
+                DOB = new DateTime(1992, 08, 12)
+            }
+        };
+
+        await userService.RegisterUserAsync(managerUser, "Manager123");
+        Console.WriteLine("manager is created");
+    }
+}
+
+
 app.Run();
+

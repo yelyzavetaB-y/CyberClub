@@ -1,13 +1,81 @@
 ﻿@using CyberClub.ViewModels
 @model BookingViewModel
 
+<!-- Modal HTML -->
+<div class="modal fade" id="confirmBookingModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Booking</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Date:</strong> <span id="modal-date"></span></p>
+                <p><strong>Time:</strong> <span id="modal-time"></span></p>
+                <p><strong>Duration:</strong> <span id="modal-duration"></span> min</p>
+                <p><strong>Zone:</strong> <span id="modal-zone"></span></p>
+                <p><strong>Seat:</strong> <span id="modal-seat"></span></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button id="confirmBookingBtn" class="btn btn-primary">Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .modal-backdrop.show {
+        opacity: 0 !important;
+    }
+
+    .modal-backdrop {
+        --bs-backdrop-zindex: 0;
+    }
+
+    .zone-dot {
+        display: inline-block;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        border: 1px solid #ccc;
+    }
+  
+    .zone-list {
+        padding: 8px 0;
+    }
+
+    .zone-color-indicator {
+        display: inline-block;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        border: 1px solid #ccc;
+        margin-right: 6px;
+    }
+
+    .zone-list-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 4px 8px;
+    }
+
+        .zone-list-item:hover {
+            background-color: rgba(0,0,0,0.05);
+        }
+
+    .treeview-menu {
+        padding-left: 15px;
+    }
+
+    .form-control {
+        margin-bottom: 12px;
+    }
+</style>
+
 <div class="sidebarMenuScroll">
-
-
-
     <form method="post" asp-action="FinalizeBooking" id="pageform">
-
-
         <input type="hidden" id="SelectedSeatId" name="SelectedSeatId" />
 
         <ul class="sidebar-menu">
@@ -25,15 +93,6 @@
                     <li>
                         <label>Time:</label>
                         <input type="time" asp-for="SelectedTimeRaw" class="form-control auto-fetch" />
-                        @*  <input asp-for="SelectedTimeRaw"
-                               type="time"
-                               class="form-control auto-fetch"
-                               value="@Model.SelectedTimeRaw"
-                               data-initial-time="@Model.SelectedTimeRaw" /> *@
-
-                        @*    <p class="text-danger">RAW FROM MODEL: @Model.SelectedTimeRaw</p> *@
-
-
                     </li>
                     <li>
                         <label>Duration (minutes):</label>
@@ -46,51 +105,48 @@
                     </li>
                 </ul>
             </li>
-
-            <li class="treeview">
-                <a href="#"><i class="bi bi-ui-checks-grid"></i><span class="menu-text">Choose a Zone</span></a>
-                <ul class="treeview-menu">
-                    <li>
-                        <label>Select Zone:</label>
-                        <select asp-for="SelectedZoneId" class="form-control">
-                            <option value="">Please choose</option>
-                            @foreach (var zone in Model.Zones)
-                            {
-                                <option value="@zone.ZoneID">@zone.Name</option>
-                            }
-                        </select>
-                    </li>
-                </ul>
-            </li>
-
-            @*   <li>
-                <button type="submit" class="btn btn-secondary mt-3 w-100">🔄 Update Seats</button>
-            </li> *@
         </ul>
 
         <ul class="sidebar-menu">
             <li class="treeview">
-                <a href="#"><i class="bi bi-person-check"></i><span class="menu-text">Choose a Seat</span></a>
-                <ul class="treeview-menu" id="seatList">
-                    @if (Model.Seats != null && Model.Seats.Any())
-                    {
-                        foreach (var seat in Model.Seats)
-                        {
-                            <li>
-                                <label>
-                                    <input type="radio" name="SelectedSeatId" value="@seat.SeatID" />
-                                    @seat.SeatNumber
-                                </label>
+                <a href="#"><i class="bi bi-map"></i><span>Club Zones</span></a>
+                <ul class="treeview-menu">
+                    <li>
+                        <ul class="zone-list">
+                            <li class="zone-list-item">
+                                <span class="zone-color-indicator" style="background-color:#28a745;"></span>
+                                <span>Pro Zone</span>
                             </li>
-                        }
-                    }
-                    else
-                    {
-                        <li><span class="text-muted">No seats available. Choose zone/date/time and update.</span></li>
-                    }
+                            <small class="text-muted">High-end PCs for competitive gaming.</small>
+                            <li class="zone-list-item">
+                                <span class="zone-color-indicator" style="background-color:#007bff;"></span>
+                                <span>VIP Zone</span>
+                            </li>
+                            <small class="text-muted">Private room with premium comfort and equipment.</small>
+                            <li class="zone-list-item">
+                                <span class="zone-color-indicator" style="background-color:#ffc107;"></span>
+                                <span>Playstation</span>
+                            </li>
+                            <small class="text-muted">Console area with PS5s and lounge chairs.</small>
+                        </ul>
+                    </li>
                 </ul>
             </li>
+        </ul>
 
+        <ul class="sidebar-menu">
+            <li class="treeview">
+                <a href="#"><i class="bi bi-trophy"></i><span>Tournaments</span></a>
+                <ul class="treeview-menu">
+                    <li>
+                        <a asp-controller="Tournament" asp-action="Index">All Tournaments</a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+
+
+        <ul class="sidebar-menu">
             <li>
                 <input type="hidden" name="UserID" value="@Context.Session.GetInt32("UserID")" />
                 <input type="hidden" name="SelectedDate" value="@Model.SelectedDate.ToString("yyyy-MM-dd")" />
@@ -98,69 +154,85 @@
                 <input type="hidden" name="Duration" value="@Model.Duration" />
                 <input type="hidden" name="SelectedZoneId" value="@Model.SelectedZoneId" />
 
-                <input type="hidden" name="SelectedSeatId" id="SelectedSeatIdHidden" />
-
-                <button id="showConfirmModalBtn" type="submit" class="btn btn-primary mt-3 w-100">Book Now</button>
-
+                <button type="button" id="showConfirmModalBtn" class="btn btn-primary mt-3 w-100">Book Now</button>
             </li>
         </ul>
     </form>
 </div>
+<script>
+   
+    console.log("[DEBUG] Script loaded");
+    console.log("[DEBUG] Bootstrap available:", typeof bootstrap !== 'undefined' ? "Yes" : "No");
 
-<!-- Modal -->
-<div class="modal fade" id="confirmBookingModal" tabindex="-1" aria-labelledby="confirmBookingLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content bg-dark text-white">
-            <div class="modal-header">
-                <h5 class="modal-title" id="confirmBookingLabel">Confirm Booking</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p><strong>Date:</strong> <span id="modal-date"></span></p>
-                <p><strong>Time:</strong> <span id="modal-time"></span></p>
-                <p><strong>Duration:</strong> <span id="modal-duration"></span> mins</p>
-                <p><strong>Zone:</strong> <span id="modal-zone"></span></p>
-                <p><strong>Seat:</strong> <span id="modal-seat"></span></p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button id="confirmBookingBtn" type="button" class="btn btn-primary">Confirm</button>
-            </div>
-        </div>
-    </div>
-</div>
+    document.addEventListener("DOMContentLoaded", function() {
+        console.log("[DEBUG] DOM fully loaded");
 
+        const modalElement = document.getElementById('confirmBookingModal');
+        console.log("[DEBUG] Modal element:", modalElement ? "Found" : "NOT FOUND");
 
-@section Scripts {
-    <script>
-        document.getElementById("showConfirmModalBtn").addEventListener("click", function () {
-            const date = document.querySelector('[name="SelectedDate"]').value;
-            const time = document.querySelector('[name="SelectedTimeRaw"]').value;
-            const duration = document.querySelector('[name="Duration"]').value;
-            const zone = document.querySelector('[name="SelectedZoneId"] option:checked').text;
-            const seat = document.querySelector('[name="SelectedSeatId"]:checked')?.parentElement?.textContent?.trim();
+        if (!modalElement) {
+            console.error("[ERROR] Modal element with ID 'confirmBookingModal' not found");
+            return;
+        }
 
-            if (!seat) {
-                alert("❗ Please choose a seat.");
-                return;
-            }
+        console.log("[DEBUG] Initializing modal...");
+        var confirmModal = new bootstrap.Modal(modalElement);
+        console.log("[DEBUG] Modal initialized:", confirmModal);
 
-            // Показуємо обрані значення в модалці
-            document.getElementById("modal-date").textContent = date;
-            document.getElementById("modal-time").textContent = time;
-            document.getElementById("modal-duration").textContent = duration;
-            document.getElementById("modal-zone").textContent = zone;
-            document.getElementById("modal-seat").textContent = seat;
+        const showModalBtn = document.getElementById("showConfirmModalBtn");
+        console.log("[DEBUG] Show modal button:", showModalBtn ? "Found" : "NOT FOUND");
 
-            // Bootstrap: відкриття модалки
-            var modal = new bootstrap.Modal(document.getElementById("confirmBookingModal"));
-            modal.show();
-        });
+        if (showModalBtn) {
+            showModalBtn.addEventListener("click", function(e) {
+                console.log("[DEBUG] Show modal button clicked");
+                e.preventDefault();
 
-        // Підтвердження бронювання
-        document.getElementById("confirmBookingBtn").addEventListener("click", function () {
-            document.getElementById("pageform").submit();
-        });
-    </script>
+                const date = document.querySelector('[name="SelectedDate"]').value;
+                const time = document.querySelector('[name="SelectedTimeRaw"]').value;
+                const duration = document.querySelector('[name="Duration"]').value;
+                const zoneEl = document.querySelector('[name="SelectedZoneId"] option:checked');
+                const zone = zoneEl ? zoneEl.textContent : 'N/A';
 
-}
+                console.log("[DEBUG] Form values:", {date, time, duration, zone});
+
+                const seatElement = document.querySelector('.seat.selected');
+                console.log("[DEBUG] Selected seat element:", seatElement);
+
+                if (!seatElement) {
+                    console.warn("[WARNING] No seat selected");
+                    alert("❗ Please select a seat on the map.");
+                    return;
+                }
+
+                const seatNumberEl = seatElement.querySelector('.seat-number');
+                const seatNumber = seatNumberEl ? seatNumberEl.textContent : 'N/A';
+                const seatId = seatElement.getAttribute('data-id');
+                console.log("[DEBUG] Seat details:", {seatNumber, seatId});
+
+                document.getElementById("SelectedSeatId").value = seatId;
+
+                document.getElementById("modal-date").textContent = date;
+                document.getElementById("modal-time").textContent = time;
+                document.getElementById("modal-duration").textContent = duration;
+                document.getElementById("modal-zone").textContent = zone;
+                document.getElementById("modal-seat").textContent = seatNumber;
+
+                console.log("[DEBUG] Attempting to show modal...");
+                try {
+                    confirmModal.show();
+                    console.log("[DEBUG] Modal show command executed");
+                } catch (error) {
+                    console.error("[ERROR] Failed to show modal:", error);
+                }
+            });
+        }
+
+        const confirmBtn = document.getElementById("confirmBookingBtn");
+        if (confirmBtn) {
+            confirmBtn.addEventListener("click", function() {
+                console.log("[DEBUG] Confirm button clicked, submitting form...");
+                document.getElementById("pageform").submit();
+            });
+        }
+    });
+</script>

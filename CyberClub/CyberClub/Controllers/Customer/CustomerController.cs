@@ -49,20 +49,55 @@ namespace CyberClub.Controllers.Customer
 
             return View("CustomerPanel", model);
         }
-        [HttpPost]
-        public async Task<IActionResult> FinalizeBooking(BookingViewModel model)     /*C-UC-3*/
+
+        [HttpPost]    /*С-UC-3: Book a Session*/
+        public async Task<IActionResult> FinalizeBooking(BookingViewModel model)
         {
+            if (!string.IsNullOrEmpty(model.SelectedTimeRaw) &&
+    TimeSpan.TryParse(model.SelectedTimeRaw, out var parsedTime))
+            {
+                model.SelectedTime = parsedTime;
+            }
+            else
+            {
+                Console.WriteLine("❌ Failed to parse SelectedTimeRaw — fallback to 12:00");
+                model.SelectedTime = new TimeSpan(12, 0, 0);
+            }
+
+
             if (!ModelState.IsValid || model.SelectedSeatId == 0 || model.UserID == 0)
             {
+                ModelState.AddModelError("", "Please fill all required fields.");
 
-                ModelState.AddModelError("", "Fill data.");
-                model.Zones = await _zoneService.GetAllZonesAsync();
-                model.Seats = await _seatService.GetSeatsByZoneIdAsync(model.SelectedZoneId);
-                Console.WriteLine("Seat: " + model.SelectedSeatId);
-                Console.WriteLine("User: " + model.UserID);
+                var zones = await _zoneService.GetAllZonesAsync();
+                var colorPalette = new[] { "#28a745", "#007bff", "#ffc107", "#6610f2", "#17a2b8", "#e83e8c" };
+
+                model.ZonesWithSeats = new List<ZoneWithSeatsViewModel>();
+
+                foreach (var zone in zones)
+                {
+                    var seats = await _seatService.GetSeatsWithAvailabilityAsync(zone.ZoneID,
+                        model.SelectedDate + model.SelectedTime,
+                        model.Duration);
+
+                    model.ZonesWithSeats.Add(new ZoneWithSeatsViewModel
+                    {
+                        ZoneID = zone.ZoneID,
+                        Name = zone.Name,
+                        Color = colorPalette[zones.IndexOf(zone) % colorPalette.Length],
+                        Seats = seats.Select(s => new SeatWithStatusViewModel
+                        {
+                            SeatID = s.SeatID,
+                            SeatNumber = s.SeatNumber,
+                            IsAvailable = s.IsAvailable
+                        }).ToList()
+                    });
+                }
+
                 return View("CustomerPanel", model);
             }
-            var startDateTime = model.SelectedDate + TimeSpan.Parse(model.SelectedTimeRaw);
+
+            var startDateTime = model.SelectedDate + model.SelectedTime;
 
             var success = await _bookingService.BookSeatAsync(
                 model.SelectedSeatId,
@@ -70,13 +105,38 @@ namespace CyberClub.Controllers.Customer
                 startDateTime,
                 model.Duration
             );
+            Console.WriteLine($"📅 Date: {model.SelectedDate}, 🕒 Time: {model.SelectedTime}, ⏰ Raw: {model.SelectedTimeRaw} and {startDateTime}");
 
             if (!success)
             {
-                ModelState.AddModelError("", "error.");
-                model.Zones = await _zoneService.GetAllZonesAsync();
-                model.Seats = await _seatService.GetSeatsByZoneIdAsync(model.SelectedZoneId);
-                return View(model);
+                ModelState.AddModelError("", "The seat is already booked for the selected time period.");
+
+                var zones = await _zoneService.GetAllZonesAsync();
+                var colorPalette = new[] { "#28a745", "#007bff", "#ffc107", "#6610f2", "#17a2b8", "#e83e8c" };
+
+                model.ZonesWithSeats = new List<ZoneWithSeatsViewModel>();
+
+                foreach (var zone in zones)
+                {
+                    var seats = await _seatService.GetSeatsWithAvailabilityAsync(zone.ZoneID,
+                        startDateTime,
+                        model.Duration);
+
+                    model.ZonesWithSeats.Add(new ZoneWithSeatsViewModel
+                    {
+                        ZoneID = zone.ZoneID,
+                        Name = zone.Name,
+                        Color = colorPalette[zones.IndexOf(zone) % colorPalette.Length],
+                        Seats = seats.Select(s => new SeatWithStatusViewModel
+                        {
+                            SeatID = s.SeatID,
+                            SeatNumber = s.SeatNumber,
+                            IsAvailable = s.IsAvailable
+                        }).ToList()
+                    });
+                }
+
+                return View("CustomerPanel", model);
             }
 
             return RedirectToAction("Panel");
@@ -85,6 +145,7 @@ namespace CyberClub.Controllers.Customer
         {
             return View();
         }
+
         public IActionResult Settings()
         {
             var dobStr = HttpContext.Session.GetString("DOB");
@@ -108,41 +169,64 @@ namespace CyberClub.Controllers.Customer
 
             return View(model);
         }
-        /* C-UC-2 */
-        [HttpGet]
+
+        [HttpGet]   /* C-UC-2 */
         public async Task<IActionResult> Panel()
         {
             int? userId = HttpContext.Session.GetInt32("UserID");
 
-            var now = DateTime.Now;
-            int roundedMinutes = ((now.Minute + 14) / 15) * 15;
-            int hour = now.Hour + (roundedMinutes == 60 ? 1 : 0);
-            int minutes = roundedMinutes == 60 ? 0 : roundedMinutes;
+            var zones = await _zoneService.GetAllZonesAsync();
+            Console.WriteLine($"Found {zones?.Count} zones");
 
-            if (hour >= 24)
+            if (zones == null || !zones.Any())
             {
-                hour = 23;
-                minutes = 45;
+                Console.WriteLine("No zones found in database"); 
+                                                                 
+                zones = new List<Zone>
+        {
+            new Zone { ZoneID = 1, Name = "VIP Area", Capacity = 10 },
+            new Zone { ZoneID = 2, Name = "Gaming Zone", Capacity = 20 }
+        };
             }
 
-            var rounded = new TimeSpan(hour, minutes, 0);
+            var colorPalette = new[] { "#28a745", "#007bff", "#ffc107", "#6610f2", "#17a2b8", "#e83e8c" };
 
-            //await _seatService.ReleaseSeatsWithEndedBookingsAsync();
+            var zonesWithSeats = new List<ZoneWithSeatsViewModel>();
+
+            foreach (var zone in zones)
+            {
+                var seats = await _seatService.GetSeatsWithAvailabilityAsync(zone.ZoneID,
+                    DateTime.Now.Date + new TimeSpan(DateTime.Now.Hour, 0, 0),
+                    60); 
+
+                zonesWithSeats.Add(new ZoneWithSeatsViewModel
+                {
+                    ZoneID = zone.ZoneID,
+                    Name = zone.Name,
+                    Capacity = zone.Capacity,
+                    Color = colorPalette[zones.IndexOf(zone) % colorPalette.Length],
+                    Seats = seats?.Select(s => new SeatWithStatusViewModel
+                    {
+                        SeatID = s.SeatID,
+                        SeatNumber = s.SeatNumber,
+                        IsAvailable = s.IsAvailable
+                    }).ToList() ?? new List<SeatWithStatusViewModel>()
+                });
+            }
 
             var viewModel = new BookingViewModel
             {
                 UserID = userId ?? 0,
-                Zones = await _zoneService.GetAllZonesAsync(),
-                SelectedDate = now.Date,
-                SelectedTime = rounded,
-                Duration = 60
+                SelectedDate = DateTime.Now.Date,
+                SelectedTime = new TimeSpan(DateTime.Now.Hour, 0, 0),
+                SelectedTimeRaw = new TimeSpan(DateTime.Now.Hour, 0, 0).ToString(@"hh\:mm"),
+                Duration = 60,
+                ZonesWithSeats = zonesWithSeats
             };
 
-            viewModel.SelectedTimeRaw = viewModel.SelectedTime.ToString(@"hh\:mm");
-
             return View("CustomerPanel", viewModel);
-
         }
+
         [HttpGet]
         public async Task<IActionResult> GetSeatsByZone(int zoneId, string startTime, int duration)
         {
@@ -161,43 +245,7 @@ namespace CyberClub.Controllers.Customer
             }));
         }
 
-        [HttpPost]
-        public async Task<IActionResult> CancelBooking(int id)
-        {
-            var success = await _bookingService.CancelBookingAsync(id);
-            if (success)
-                return RedirectToAction("MyBookingsList");
-
-            ModelState.AddModelError("", "Failed to cancel booking");
-            return RedirectToAction("MyBookingsList");
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> MyBookingsList()
-        {
-            int? userId = HttpContext.Session.GetInt32("UserID");
-            if (userId == null || userId == 0)
-            {
-                return RedirectToAction("Panel");
-            }
-
-            var bookings = await _bookingService.GetBookingsByUserIdAsync(userId.Value);
-
-            var model = new MyBookingsViewModel
-            {
-                Bookings = bookings.Select(b => new UserBookingInfo
-                {
-                    Id = b.BookingID,
-                    StartTime = b.StartTime,
-                    Duration = b.Duration,
-                    SeatNumber = b.Seat?.SeatNumber ?? "N/A",
-                    ZoneName = b.Zone?.Name ?? "N/A",
-                    Status = b.Status.ToString()
-                }).ToList()
-            };
-
-            return View(model);
-        }
+       
 
 
     }

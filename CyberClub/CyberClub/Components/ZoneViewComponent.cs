@@ -2,6 +2,7 @@
 using CyberClub.Domain.Services;
 using CyberClub.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using System.Reflection;
 
 namespace CyberClub.Components
 {
@@ -16,6 +17,7 @@ namespace CyberClub.Components
 
         public async Task<IViewComponentResult> InvokeAsync()
         {
+
             var zones = await _zoneService.GetAllZonesAsync();
             int? userId = HttpContext.Session.GetInt32("UserID");
             var viewModel = new BookingViewModel
@@ -26,6 +28,10 @@ namespace CyberClub.Components
                 SelectedTimeRaw = DateTime.Now.TimeOfDay.ToString("hh\\:mm"),
                 Duration = 60
             };
+            if (viewModel.Zones == null || !viewModel.Zones.Any())
+            {
+                viewModel.Zones = await _zoneService.GetAllZonesAsync();
+            }
             return View("Zone", viewModel);
         }
 
