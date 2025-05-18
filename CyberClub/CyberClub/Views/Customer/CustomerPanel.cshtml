@@ -1,0 +1,310 @@
+﻿@model CyberClub.ViewModels.BookingViewModel
+
+@{
+    Layout = "~/Views/Customer/_CustomerLayout.cshtml";
+}
+
+<div class="wrapper">
+    <form asp-action="FinalizeBooking" method="post">
+        <input type="hidden" name="UserID" value="@Model.UserID" />
+        <input type="hidden" name="SelectedDate" value="@Model.SelectedDate.ToString("yyyy-MM-dd")" />
+        <input type="hidden" name="SelectedTimeRaw" value="@Model.SelectedTimeRaw" />
+        <input type="hidden" name="Duration" value="@Model.Duration" />
+        <input type="hidden" id="SelectedSeatId" name="SelectedSeatId" />
+
+        <div class="cyberclub-map">
+            <div class="pc-section">
+                @foreach (var zone in Model.ZonesWithSeats.Where(z => z.Name != "Playstation"))
+                {
+                    <div class="zone" style="border-color: @zone.Color;">
+                       
+                        <div class="zone-seats">
+                            @foreach (var seat in zone.Seats)
+                            {
+                                <div class="seat pc @(seat.IsAvailable ? "available" : "unavailable")"
+                                     style="background-color:@(seat.IsAvailable ? zone.Color : "#6c757d")"
+                                     onclick="selectSeat(this, '@seat.SeatID')"
+                                     data-id="@seat.SeatID"
+                                     title="@seat.SeatNumber - @(seat.IsAvailable ? "Available" : "Booked")">
+                                    <div class="seat-icon">🖥️</div>
+                                    <div class="seat-number">@seat.SeatNumber</div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <div class="console-section">
+                @foreach (var zone in Model.ZonesWithSeats.Where(z => z.Name == "Playstation"))
+                {
+                    <div class="console-zone-wrapper">
+                        <div class="console-seats-scrollable">
+                            @foreach (var seat in zone.Seats)
+                            {
+                                <div class="seat console @(seat.IsAvailable ? "available" : "unavailable")"
+                                     style="background-color:@(seat.IsAvailable ? zone.Color : "#6c757d")"
+                                     onclick="selectSeat(this, '@seat.SeatID')"
+                                     data-id="@seat.SeatID"
+                                     title="@seat.SeatNumber - @(seat.IsAvailable ? "Available" : "Booked")">
+                                    <div class="seat-icon">🎮</div>
+                                    <div class="seat-number">@seat.SeatNumber</div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="booking-controls">
+            <div class="selected-seat-info" id="selected-seat-info"></div>
+        </div>
+    </form>
+</div>
+
+
+<style>
+    /* Base Layout */
+    .cyberclub-map {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 80vh;
+    }
+
+    /* PC Zones - Grid Layout */
+    .pc-section,
+    .console-section {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+    }
+
+    .zone {
+        padding: 20px;
+        min-width: 300px;
+    }
+
+    .zone-seats {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+        gap: 12px;
+    }
+
+    /* Console Zone - Centered Layout */
+    .console-section {
+        margin-top: 40px;
+        width: 100%;
+        padding: 20px 0;
+        border-radius: 8px;
+        display: flex;
+        justify-content: center;
+    }
+
+    .console-zone-wrapper {
+        width: auto;
+        margin-bottom: 20px;
+    }
+
+    .console-seats-container {
+        width: 100%;
+        overflow: hidden;
+    }
+
+    .console-seats-scrollable {
+        display: flex;
+        flex-direction: row;
+        gap: 15px;
+        padding: 15px;
+        overflow-x: auto;
+        scroll-snap-type: x proximity;
+        scrollbar-width: thin;
+        -webkit-overflow-scrolling: touch;
+    }
+
+        .console-seats-scrollable .seat {
+            flex: 0 0 auto;
+            width: 50px;
+            height: 50px;
+            scroll-snap-align: start;
+        }
+
+    /* Seat specific styles for console */
+    .seat.console {
+        border-radius: 50%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin: 0 5px;
+    }
+
+    /* Scrollbar styling */
+    .console-seats-scrollable::-webkit-scrollbar {
+        height: 10px;
+    }
+
+    .console-seats-scrollable::-webkit-scrollbar-track {
+        background: rgba(255,255,255,0.1);
+        border-radius: 10px;
+    }
+
+    .console-seats-scrollable::-webkit-scrollbar-thumb {
+        border-radius: 10px;
+    }
+
+        .console-seats-scrollable::-webkit-scrollbar-thumb:hover {
+            background: rgba(255,255,255,0.5);
+        }
+
+    /* Seat Styles */
+    .seat {
+        width: 50px;
+        height: 50px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 12px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        position: relative;
+        flex-shrink: 0;
+    }
+
+        .seat.pc {
+            border-radius: 8px;
+        }
+
+        .seat.console {
+            border-radius: 50%;
+        }
+
+        .seat.available:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+        }
+
+        .seat.unavailable {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+            .seat.unavailable::after {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: linear-gradient(135deg, transparent 45%, #dc3545 46%, #dc3545 54%, transparent 55%);
+            }
+
+        .seat.selected {
+            outline: 3px solid #0d6efd;
+            box-shadow: 0 0 15px rgba(13, 110, 253, 0.5);
+        }
+
+    .seat-icon {
+        font-size: 14px;
+        margin-bottom: 2px;
+    }
+
+    /* Booking Controls */
+    .booking-controls {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+        margin-top: 30px;
+        padding: 15px;
+    }
+
+    .selected-seat-info {
+        color: white;
+        font-size: 1.1rem;
+        padding: 8px 15px;
+        border-radius: 5px;
+        background-color: #0f3460;
+    }
+
+    #book-button {
+        padding: 10px 25px;
+        font-size: 1.1rem;
+        background-color: #4ecca3;
+        border: none;
+    }
+
+        #book-button:hover {
+            background-color: #3cb391;
+        }
+
+        #book-button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+</style>
+
+@section Scripts {
+    <script>
+        function autoUpdateMap() {
+            const date = document.querySelector('[name="SelectedDate"]').value;
+            const time = document.querySelector('[name="SelectedTimeRaw"]').value;
+            const duration = document.querySelector('[name="Duration"]').value;
+            const zoneId = document.querySelector('[name="SelectedZoneId"]').value;
+
+            if (!date || !time || !zoneId || !duration) {
+                console.warn("Missing input(s) for seat map update.");
+                return;
+            }
+
+            $.ajax({
+                url: '/Customer/UpdateBooking',
+                type: 'POST',
+                data: {
+                    SelectedDate: date,
+                    SelectedTimeRaw: time,
+                    Duration: duration,
+                    SelectedZoneId: zoneId
+                },
+                success: function (response) {
+                    console.log("[DEBUG] Seat map updated.");
+                    const newSeats = $(response).find('#seatList').html();
+                    $('#seatList').html(newSeats);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Failed to update seat map:", error);
+                }
+            });
+        }
+
+        $(document).ready(function () {
+            $('[name="SelectedDate"], [name="SelectedTimeRaw"], [name="Duration"], [name="SelectedZoneId"]').on('change', autoUpdateMap);
+        });
+    </script>
+    <script>
+                function selectSeat(el, seatId) {
+            if (el.classList.contains('unavailable')) return;
+
+            document.querySelectorAll('.seat').forEach(s => s.classList.remove('selected'));
+
+            el.classList.add('selected');
+            document.getElementById("SelectedSeatId").value = seatId;
+
+            const seatNumber = el.querySelector('.seat-number').textContent;
+            const seatInfo = document.getElementById("selected-seat-info");
+            if (seatInfo) {
+                seatInfo.textContent = `Selected: ${seatNumber}`;
+            }
+        }
+
+    </script>
+}
+
+
+
+
+

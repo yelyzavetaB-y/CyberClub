@@ -1,0 +1,66 @@
+﻿@model CyberClub.ViewModels.LoginViewModel
+@{
+    Layout = "_AuthLayout";
+    ViewData["Title"] = "Login";
+}
+
+<div class="auth-wrapper">
+    <!-- Form starts -->
+    <form asp-action="Login" asp-controller="Auth" method="post">
+        <div class="auth-box">
+            <a href="index.html" class="auth-logo mb-4">
+                <img src="~/assets/images/logo.svg" alt="Logo*" />
+            </a>
+
+            <h4 class="mb-4">Login</h4>
+
+            <div class="mb-2">
+                <label asp-for="Email" class="form-label"></label>
+                <input asp-for="Email" class="form-control" placeholder="Enter email">
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <div class="mb-2">
+                <label asp-for="Password" class="form-label"></label>
+                <div class="input-group">
+                    <input asp-for="Password" class="form-control" placeholder="Enter password">
+                    <button class="btn btn-outline-secondary" type="button">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                </div>
+                <span asp-validation-for="Password" class="text-danger"></span>
+                <div class="form-text">
+                    Your password must be 8-20 characters long.
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between mb-4">
+                @*  <div class="form-check m-0">
+                    <input class="form-check-input" type="checkbox" value="yes" name="remember_me" id="rememberPassword">
+                    <label class="form-check-label small" for="rememberPassword">Remember</label>
+                </div>
+                <a href="forgot-password.html" class="text-decoration-underline small">Forgot password?</a> *@
+            </div>
+
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-danger">Login</button>
+                <a asp-controller="Auth" asp-action="Signup" class="btn btn-secondary">Not registered? Signup</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    function togglePasswordVisibility() {
+        var passwordInput = document.getElementById('password');
+        var passwordIcon = passwordInput.nextElementSibling.getElementsByTagName('i')[0];
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            passwordIcon.classList.replace('bi-eye', 'bi-eye-slash');
+        } else {
+            passwordInput.type = 'password';
+            passwordIcon.classList.replace('bi-eye-slash', 'bi-eye');
+        }
+    }
+</script>
+

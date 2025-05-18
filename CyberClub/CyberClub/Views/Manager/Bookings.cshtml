@@ -1,0 +1,82 @@
+﻿@model List<CyberClub.ViewModels.BookingAdminViewModel>
+@{
+    Layout = "_ManagerLayout";
+    ViewData["Title"] = "Manage Bookings";
+}
+
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.5/css/jquery.dataTables.min.css" />
+
+
+<table id="bookingTable" class="display table table-bordered table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th>ID</th>
+            <th>User</th>
+            <th>Zone</th>
+            <th>Seat</th>
+            <th>Start Time</th>
+            <th>Duration</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var b in Model)
+        {
+            <tr>
+                <td>@b.BookingID</td>
+                <td>@b.UserEmail</td>
+                <td>@b.ZoneName</td>
+                <td>@b.SeatNumber</td>
+                <td>@b.StartTime.ToString("yyyy-MM-dd HH:mm")</td>  
+                <td>@b.Duration min</td>
+                <td>
+                    <span class="badge bg-@GetStatusClass(b.Status)">
+                        @b.Status
+                    </span>
+                </td>
+                <td>
+                    <form asp-action="UpdateBookingStatus" method="post" class="d-inline">
+                        <input type="hidden" name="id" value="@b.BookingID" />
+                        <select name="newStatus" class="form-select form-select-sm d-inline w-auto">
+                            <option value="Pending" selected="@(b.Status == "Pending")">Pending</option>
+                            <option value="Confirmed" selected="@(b.Status == "Confirmed")">Confirmed</option>
+                            <option value="Completed" selected="@(b.Status == "Completed")">Completed</option>
+                        </select>
+                        <button type="submit" class="btn btn-sm btn-primary ms-1">Update</button>
+                    </form>
+
+                    <form asp-action="CancelBooking" method="post" class="d-inline ms-2">
+                        <input type="hidden" name="id" value="@b.BookingID" />
+                        <button type="submit" class="btn btn-sm btn-danger">Cancel</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#bookingTable').DataTable({
+                order: [[4, 'desc']], 
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.5/i18n/en.json'
+                }
+            });
+        });
+    </script>
+}
+
+@functions {
+    string GetStatusClass(string status) => status switch
+    {
+        "Confirmed" => "success",
+        "Pending" => "warning",
+        "Cancelled" => "danger",
+        "Completed" => "secondary",
+        _ => "light"
+    };
+}

@@ -1,0 +1,69 @@
+﻿@model CyberClub.ViewModels.UserViewModel
+@{
+    Layout = "_AuthLayout";
+    ViewData["Title"] = "SignUp";
+}
+
+<div class="auth-wrapper">
+
+    <!-- Form starts -->
+    <form asp-controller="Auth" asp-action="Signup" method="post">
+        <div class="auth-box">
+            <a href="index.html" class="auth-logo mb-4">
+                <img src="~/assets/images/logo.svg" alt="Logo" />
+            </a>
+            <h4 class="mb-4">Create an account</h4>
+
+            <!-- Name Field -->
+            <div class="mb-2">
+                <label asp-for="FullName" class="form-label"></label>
+                <input asp-for="FullName" class="form-control" placeholder="Enter name">
+                <span asp-validation-for="FullName" class="text-danger"></span>
+            </div>
+
+            <!-- Email Field -->
+            <div class="mb-2">
+                <label asp-for="Email" class="form-label"></label>
+                <input asp-for="Email" class="form-control" placeholder="Enter email">
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <!-- Date of Birth Field -->
+            <div class="mb-2">
+                <label asp-for="DOB" class="form-label"></label>
+                <input asp-for="DOB" type="date" class="form-control">
+                <span asp-validation-for="DOB" class="text-danger"></span>
+            </div>
+
+            <!-- Phone Number Field -->
+            <div class="mb-2">
+                <label asp-for="PhoneNumber" class="form-label"></label>
+                <input asp-for="PhoneNumber" class="form-control" placeholder="Enter phone number">
+                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+            </div>
+
+            <!-- Password Field -->
+            <div class="mb-4">
+                <label asp-for="Password" class="form-label"></label>
+                <div class="input-group">
+                    <input asp-for="Password" class="form-control" placeholder="Enter password">
+                    <button class="btn btn-outline-secondary" type="button">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                </div>
+                <span asp-validation-for="Password" class="text-danger"></span>
+                <div class="form-text">
+                    Your password must be 8-20 characters long.
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-danger">Signup</button>
+                <a asp-controller="Auth" asp-action="Login" class="btn btn-secondary">Already have an account? Login</a>
+            </div>
+        </div>
+    </form>
+
+</div>
+
