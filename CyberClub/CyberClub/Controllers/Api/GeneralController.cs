@@ -1,10 +1,8 @@
-﻿using CyberClub.Api.Interfaces;
-using Microsoft.AspNetCore.Http;
+﻿using CyberClub.Domain.Interfaces;
+using CyberClub.Domain.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
-using System.Threading.Tasks;
 
-namespace CyberClub.Api.Controllers
+namespace CyberClub.Controllers.Api
 {
     [Route("api/[controller]")]
     [ApiController]

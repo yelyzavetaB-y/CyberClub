@@ -1,12 +1,11 @@
 using CyberClub.Domain.Interfaces;
 using CyberClub.Domain.Models;
 using CyberClub.Domain.Services;
+using CyberClub.Domain.Services.Handlers;
+using CyberClub.Domain.Validators;
 using CyberClub.Infrastructure.DBService;
 using CyberClub.Infrastructure.Interfaces;
 using CyberClub.Infrastructure.Repositories;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authorization;
-
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +19,12 @@ builder.Services.AddScoped<ISeatRepository, SeatRepository>();
 builder.Services.AddScoped<SeatService>();
 builder.Services.AddScoped<IBookingRepository, BookingRepository>();
 builder.Services.AddScoped<BookingService>();
+builder.Services.AddScoped<TournamentService>();
+builder.Services.AddScoped<ITournamentRepository, TournamentRepository>();
+builder.Services.AddScoped<IBookingApiRepository, BookingApiRepository>();
+builder.Services.AddScoped<IBookingService, BookingServiceApi>();
+builder.Services.AddScoped<ICustomValidator<Booking>, BookSeatValidator>();
+builder.Services.AddScoped<CustomerHandler>();
 builder.Services.AddControllersWithViews();
 builder.Services.AddSession();
 
@@ -33,7 +38,6 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
 app.UseSession();
 app.UseAuthentication();
@@ -43,32 +47,30 @@ app.MapControllerRoute(
     name: "default",
   pattern: "{controller=Home}/{action=Index}/{id?}");
 
-using (var scope = app.Services.CreateScope())
-{
-    var userService = scope.ServiceProvider.GetRequiredService<UserService>();
+//using (var scope = app.Services.CreateScope())
+//{
+//    var userService = scope.ServiceProvider.GetRequiredService<UserService>();
 
-    var existing = await userService.FindByEmailAsync("manager@cyberclub.com");
+//    var existing = await userService.FindByEmailAsync("manager@cyberclub.com");
 
-    if (existing == null)
-    {
-        var managerUser = new User
-        {
-            Email = "manager@cyberclub.com",
-            FullName = "Manager",
-            HashPassword = "Manager123",
-            RoleId = 2,
-            Profile = new UserProfile
-            {
-                PhoneNumber = "+380987541657",
-                DOB = new DateTime(1992, 08, 12)
-            }
-        };
+//    if (existing == null)
+//    {
+//        var managerUser = new User
+//        {
+//            Email = "manager@cyberclub.com",
+//            FullName = "Manager",
+//            HashPassword = "Manager123",
+//            RoleId = 2,
+//            Profile = new UserProfile
+//            {
+//                PhoneNumber = "+380987541657",
+//                DOB = new DateTime(1992, 08, 12)
+//            }
+//        };
 
-        await userService.RegisterUserAsync(managerUser, "Manager123");
-        Console.WriteLine("manager is created");
-    }
-}
-
+//        await userService.AddUserAsync(managerUser); 
+//    }
+//}
 
 app.Run();
 

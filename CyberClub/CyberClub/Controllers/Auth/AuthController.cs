@@ -46,7 +46,11 @@ namespace CyberClub.Controllers.Auth
                 {
                     HttpContext.Session.SetInt32("UserID", user.Id);
                     HttpContext.Session.SetString("User", user.Email);
-                    return RedirectToAction("Panel", "Customer");
+                    if (user.RoleId == 1)
+                        return RedirectToAction("Panel", "Customer");
+                    else if (user.RoleId == 2)
+                        return RedirectToAction("Bookings", "Manager");
+
                 }
                 ModelState.AddModelError("", "error");
             }

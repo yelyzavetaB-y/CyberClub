@@ -1,0 +1,67 @@
+﻿@model CyberClub.ViewModels.TournamentCreateViewModel
+@{
+    Layout = "_ManagerLayout";
+    ViewData["Title"] = "Create Tournament";
+}
+
+<h2 class="mb-4">Create New Tournament</h2>
+
+<form asp-action="Create" method="post" class="row g-3">
+    <div class="col-md-6">
+        <label asp-for="Name" class="form-label"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label asp-for="Game" class="form-label"></label>
+        <input asp-for="Game" class="form-control" />
+        <span asp-validation-for="Game" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label asp-for="Date" class="form-label"></label>
+        <input asp-for="Date" type="date" class="form-control" />
+        <span asp-validation-for="Date" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label asp-for="Time" class="form-label"></label>
+        <input asp-for="Time" type="time" class="form-control" />
+        <span asp-validation-for="Time" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label asp-for="Status" class="form-label"></label>
+        <select asp-for="Status" class="form-select">
+            <option>Upcoming</option>
+            <option>Ongoing</option>
+            <option>Completed</option>
+        </select>
+        <span asp-validation-for="Status" class="text-danger"></span>
+    </div>
+
+    <div class="col-12">
+        <label asp-for="Description" class="form-label"></label>
+        <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="MaxParticipants" class="form-label"></label>
+        <input asp-for="MaxParticipants" type="number" class="form-control" />
+        <span asp-validation-for="MaxParticipants" class="text-danger"></span>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="ThemeColor" class="form-label">Theme Color</label>
+        <input asp-for="ThemeColor" type="color" class="form-control form-control-color" />
+        <span asp-validation-for="ThemeColor" class="text-danger"></span>
+    </div>
+
+    <div class="col-12">
+        <button type="submit" class="btn btn-primary">Create Tournament</button>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

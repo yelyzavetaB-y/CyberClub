@@ -1,67 +1,51 @@
-﻿@{
+﻿@model List<CyberClub.Domain.Models.Tournament>
+
+@{
     Layout = "~/Views/Customer/_CustomerLayout.cshtml";
+    ViewData["Title"] = "Tournaments";
+
 }
 
-
+<h2 class="mb-4">Available Tournaments</h2>
 
 <div class="row gx-4">
-    <div class="col-md-6 col-xl-4 mb-4">
-        <div class="card h-100">
-            <div class="card-header bg-dark text-white">
-                <h5 class="card-title mb-0">🔥 CS:GO Championship</h5>
-            </div>
-            <div class="card-body">
-                <p class="mb-2">
-                    Join the top teams in an epic battle. Cash prizes & national recognition.
-                </p>
-                <ul class="list-unstyled">
-                    <li><strong>Date:</strong> June 15, 2025</li>
-                    <li><strong>Entry Fee:</strong> $10</li>
-                    <li><strong>Location:</strong> Pro Zone</li>
-                </ul>
-                <a href="/Tournament/Register/1" class="btn btn-primary mt-2">Register</a>
-            </div>
-            <div class="card-footer text-muted">
-                Last updated: 2 days ago
-            </div>
-        </div>
-    </div>
-    <div class="row gx-4">
-        <div class="col-md-6 col-xl-4 mb-4">
-            <div class="card h-100">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="card-title mb-0">🎮 Valorant Showdown</h5>
-                </div>
-                <div class="card-body">
-                    <p>Top players compete in a fast-paced 5v5 arena.</p>
-                    <ul class="list-unstyled">
-                        <li><strong>Date:</strong> May 25, 2025</li>
-                        <li><strong>Entry:</strong> Free</li>
-                        <li><strong>Zone:</strong> VIP</li>
-                    </ul>
-                    <a href="#" class="btn btn-outline-light disabled">Coming Soon</a>
-                </div>
-                <div class="card-footer text-muted">Updated 1 day ago</div>
-            </div>
-        </div>
+    @foreach (var tournament in Model)
+    {
+        var theme = tournament.ThemeColor ?? "#343a40";
+        var disabled = tournament.Status != "Upcoming";
+        var btnClass = disabled ? "btn btn-outline-secondary disabled" : "btn btn-primary";
+        var btnText = disabled ? "Coming Soon" : "Register";
 
         <div class="col-md-6 col-xl-4 mb-4">
             <div class="card h-100">
-                <div class="card-header bg-warning text-dark">
-                    <h5 class="card-title mb-0">🕹️ FIFA 24 Cup</h5>
+                <div class="card-header text-white" style="background-color:@theme">
+                    <h5 class="card-title mb-0">🎮 @tournament.Name</h5>
                 </div>
                 <div class="card-body">
-                    <p>Compete on console to become the football king.</p>
+                    <p class="mb-2">@tournament.Description ?? "Details coming soon."</p>
                     <ul class="list-unstyled">
-                        <li><strong>Date:</strong> June 10, 2025</li>
-                        <li><strong>Entry:</strong> $5</li>
-                        <li><strong>Zone:</strong> Playstation</li>
+                        <li><strong>Date:</strong> @tournament.StartDateTime.ToString("MMMM dd, yyyy")</li>
+                        <li><strong>Time:</strong> @tournament.StartDateTime.ToString("hh:mm tt")</li>
+                        <li><strong>Game:</strong> @tournament.Game</li>
+
                     </ul>
-                    <a href="#" class="btn btn-outline-dark disabled">Coming Soon</a>
+                    @if (!disabled)
+                    {
+                        <form asp-action="Register" asp-controller="Tournament" method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="tournamentId" value="@tournament.Id" />
+                            <button type="submit" class="@btnClass mt-2">@btnText</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <button class="@btnClass mt-2">@btnText</button>
+                    }
                 </div>
-                <div class="card-footer text-muted">Updated 3 days ago</div>
+                <div class="card-footer text-muted">
+                    Updated: @tournament.StartDateTime.ToShortDateString()
+                </div>
             </div>
         </div>
-    </div>
+    }
 </div>
-    <!-- остальные карточки -->

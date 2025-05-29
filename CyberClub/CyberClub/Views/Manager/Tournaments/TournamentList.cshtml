@@ -1,0 +1,94 @@
+﻿@model List<CyberClub.Domain.Models.Tournament>
+
+@{
+    Layout = "~/Views/Manager/_ManagerLayout.cshtml";
+    ViewData["Title"] = "Tournaments";
+}
+
+
+<h2 class="mb-4">Tournament Management</h2>
+
+<div class="row gx-4">
+    @if (Model != null && Model.Any())
+    {
+        foreach (var tournament in Model)
+        {
+            var headerClass = tournament.Status switch
+            {
+                "Upcoming" => "bg-primary text-white",
+                "Ongoing" => "bg-success text-white",
+                "Completed" => "bg-secondary text-white",
+                _ => "bg-dark text-white"
+            };
+            <div class="col-md-6 col-xl-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-header text-white" style="background-color:@(tournament.ThemeColor ?? "#343a40")">
+                        <h5 class="card-title mb-0">🎮 @tournament.Name</h5>
+                    </div>
+
+                    <div class="card-body">
+                        @if (tournament.MaxParticipants.HasValue)
+                        {
+                            var filled = tournament.CurrentParticipantCount;
+                            var max = tournament.MaxParticipants.Value;
+
+                            <p>
+                                <strong>Participants:</strong> @filled / @max
+                                @if (filled >= max)
+                                {
+                                    <span class="badge bg-danger ms-2">Full</span>
+                                }
+                                else if (max - filled <= 3)
+                                {
+                                    <span class="badge bg-warning text-dark ms-2">Almost full</span>
+                                }
+                            </p>
+                        }
+                        else
+                        {
+                            <p><strong>Participants:</strong> @tournament.CurrentParticipantCount</p>
+                        }
+
+                        <p class="mb-2">
+                            @(tournament.Description ?? "No description provided.")
+                        </p>
+
+                        <ul class="list-unstyled">
+                            <li><strong>Game:</strong> @tournament.Game</li>
+                            <li><strong>Date:</strong> @tournament.StartDateTime.ToString("MMMM dd, yyyy")</li>
+                            <li><strong>Time:</strong> @tournament.StartDateTime.ToString("hh:mm tt")</li>
+                            <li><strong>Status:</strong> @tournament.Status</li>
+                            <li><strong>Participants:</strong> @(tournament.MaxParticipants?.ToString() ?? "N/A")</li>
+
+
+                           
+                        </ul>
+                        @if (TempData["Message"] != null)
+                        {
+                            <div class="alert alert-info">@TempData["Message"]</div>
+                        }@* 
+                        <a href="@Url.Action("Edit", "Tournament", new { id = tournament.Id })" class="btn btn-outline-secondary mt-2">Edit</a> *@
+                        <form asp-action="DeleteTournament" asp-controller="Manager" method="post"
+                              onsubmit="return confirm('Are you sure you want to delete this tournament?');" class="mt-2">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@tournament.Id" /> 
+                            <button type="submit" class="btn btn-danger btn-sm">
+                                <i class="bi bi-trash"></i> Delete
+                            </button>
+                        </form>
+
+                    </div>
+                    <div class="card-footer text-muted">
+                        Last updated: @tournament.StartDateTime.ToShortDateString()
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="col-12">
+            <div class="alert alert-info">No tournaments found.</div>
+        </div>
+    }
+</div>

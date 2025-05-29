@@ -200,7 +200,7 @@ namespace CyberClub.Infrastructure.Repositories
         public async Task<User> FindByEmailAsync(string email)
         {
             User user = null;
-            string query = "SELECT UserID, Email, FullName, HashPassword, Salt FROM [dbo].[User] WHERE Email = @Email";
+            string query = "SELECT UserID, Email, FullName, HashPassword, Salt, RoleId FROM [dbo].[User] WHERE Email = @Email";
 
             SqlParameter[] parameters = {
             new SqlParameter("@Email", email)
@@ -216,7 +216,8 @@ namespace CyberClub.Infrastructure.Repositories
                         Email = reader.GetString(reader.GetOrdinal("Email")),
                         FullName = reader.GetString(reader.GetOrdinal("FullName")),
                         HashPassword = reader.GetString(reader.GetOrdinal("HashPassword")),
-                        Salt = reader.GetString(reader.GetOrdinal("Salt"))
+                        Salt = reader.GetString(reader.GetOrdinal("Salt")),
+                        RoleId = reader.GetInt32(reader.GetOrdinal("RoleId"))
                     };
                 }
             };
@@ -225,6 +226,10 @@ namespace CyberClub.Infrastructure.Repositories
 
             return user;
         }
+
+
+
+
     }
 }
 

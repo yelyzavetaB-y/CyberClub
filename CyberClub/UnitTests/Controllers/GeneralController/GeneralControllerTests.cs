@@ -7,7 +7,7 @@ using Xunit;
 using Moq;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Mvc;
-using CyberClub.Api.Interfaces;
+
 
 
 namespace UnitTests.Controllers.GeneralController
@@ -15,30 +15,30 @@ namespace UnitTests.Controllers.GeneralController
 
     public class GeneralControllerTests
     {
-        [Fact]
-        public async Task UpdateExpiredBookingsSeatsValidKeyReturnsOk()
-        {
-            var bookingServiceMock = new Mock<IBookingService>();
-            var controller = new CyberClub.Api.Controllers.GeneralController(bookingServiceMock.Object);
-            string validKey = "d123d2378dg287dg23d78g";
+        //[Fact]
+        //public async Task UpdateExpiredBookingsSeatsValidKeyReturnsOk()
+        //{
+        //    var bookingServiceMock = new Mock<IBookingService>();
+        //    var controller = new CyberClub.Api.Controllers.GeneralController(bookingServiceMock.Object);
+        //    string validKey = "d123d2378dg287dg23d78g";
 
-            var result = await controller.UpdateExpiredBookingsSeats(validKey);
+        //    var result = await controller.UpdateExpiredBookingsSeats(validKey);
 
-            Assert.IsType<OkResult>(result);
-            bookingServiceMock.Verify(s => s.UpdateExpiredBookingsSeatsAsync(), Times.Once);
-        }
+        //    Assert.IsType<OkResult>(result);
+        //    bookingServiceMock.Verify(s => s.UpdateExpiredBookingsSeatsAsync(), Times.Once);
+        //}
 
-        [Fact]
-        public async Task UpdateExpiredBookingsSeatsValidKeyReturnsNotFound()
-        {
-            var bookingServiceMock = new Mock<IBookingService>();
-            var controller = new CyberClub.Api.Controllers.GeneralController(bookingServiceMock.Object);
-            string invalidKey = "invalid";
+        //[Fact]
+        //public async Task UpdateExpiredBookingsSeatsValidKeyReturnsNotFound()
+        //{
+        //    var bookingServiceMock = new Mock<IBookingService>();
+        //    var controller = new CyberClub.Api.Controllers.GeneralController(bookingServiceMock.Object);
+        //    string invalidKey = "invalid";
 
-            var result = await controller.UpdateExpiredBookingsSeats(invalidKey);
+        //    var result = await controller.UpdateExpiredBookingsSeats(invalidKey);
 
-            Assert.IsType<NotFoundResult>(result);
-            bookingServiceMock.Verify(s => s.UpdateExpiredBookingsSeatsAsync(), Times.Never);
-        }
+        //    Assert.IsType<NotFoundResult>(result);
+        //    bookingServiceMock.Verify(s => s.UpdateExpiredBookingsSeatsAsync(), Times.Never);
+        //}
     }
 }

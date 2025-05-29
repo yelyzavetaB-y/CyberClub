@@ -1,17 +1,21 @@
-﻿using CyberClub.Api.Interfaces;
+﻿using CyberClub.Domain.Interfaces;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace CyberClub.Api.Services
+namespace CyberClub.Infrastructure.Repositories
 {
-    public class BookingService : IBookingService
+    public class BookingApiRepository : IBookingApiRepository
     {
         private readonly IConfiguration _configuration;
-
-        public BookingService(IConfiguration configuration)
+        public BookingApiRepository(IConfiguration configuration)
         {
             _configuration = configuration;
         }
-
         public async Task UpdateExpiredBookingsSeatsAsync()
         {
             using var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));

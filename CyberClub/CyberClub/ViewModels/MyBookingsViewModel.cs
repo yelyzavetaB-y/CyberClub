@@ -3,6 +3,7 @@
     public class MyBookingsViewModel
     {
         public List<UserBookingInfo> Bookings { get; set; } = new();
+        public List<TournamentViewModel> Tournaments { get; set; }
     }
 
     public class UserBookingInfo

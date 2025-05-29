@@ -14,17 +14,18 @@ namespace CyberClub.Controllers.Customer
         private readonly ZoneService _zoneService;
         private readonly SeatService _seatService;
         private readonly BookingService _bookingService;
-
-        public CustomerController(UserService userService, ZoneService zoneService, SeatService seatService, BookingService bookingService)
+        private readonly TournamentService _tournamentService;
+        public CustomerController(UserService userService, ZoneService zoneService, SeatService seatService, BookingService bookingService, TournamentService tournamentService)
         {
             _userService = userService;
             _zoneService = zoneService;
             _seatService = seatService;
             _bookingService = bookingService;
+            _tournamentService = tournamentService;
         }
 
-        [HttpPost]
-        public async Task<IActionResult> UpdateBooking(BookingViewModel model)     /*C-UC-2*/
+        [HttpPost]/*C-UC-2*/
+        public async Task<IActionResult> UpdateBooking(BookingViewModel model)
         {
             Console.WriteLine($"[UpdateBooking] Incoming SelectedTimeRaw = {model.SelectedTimeRaw}");
 
@@ -40,17 +41,38 @@ namespace CyberClub.Controllers.Customer
                 model.SelectedTime = new TimeSpan(12, 0, 0);
             }
 
-            model.Zones = await _zoneService.GetAllZonesAsync();
-            model.Seats = await _seatService.GetAvailableSeatAsync(
-                model.SelectedZoneId,
-                model.SelectedDate.Date + model.SelectedTime,
-                model.Duration >= 60 ? model.Duration : 60
-            );
+            var requestedTime = model.SelectedDate.Date + model.SelectedTime;
+            var duration = model.Duration >= 60 ? model.Duration : 60;
 
-            return View("CustomerPanel", model);
+            model.ZonesWithSeats = new List<ZoneWithSeatsViewModel>();
+            var zones = await _zoneService.GetAllZonesAsync();
+            var colorPalette = new[] { "#28a745", "#007bff", "#ffc107", "#6610f2", "#17a2b8", "#e83e8c" };
+
+            foreach (var zone in zones)
+            {
+                var seats = await _seatService.GetSeatsWithAvailabilityAsync(zone.ZoneID, requestedTime, duration);
+
+                model.ZonesWithSeats.Add(new ZoneWithSeatsViewModel
+                {
+                    ZoneID = zone.ZoneID,
+                    Name = zone.Name,
+                    Color = colorPalette[zones.IndexOf(zone) % colorPalette.Length],
+                    Seats = seats.Select(s => new SeatWithStatusViewModel
+                    {
+                        SeatID = s.SeatID,
+                        SeatNumber = s.SeatNumber,
+                        IsAvailable = s.IsAvailable
+                    }).ToList()
+                });
+            }
+            return PartialView("_SeatMapPartial", model);
+
         }
 
-        [HttpPost]    /*С-UC-3: Book a Session*/
+
+
+
+        [HttpPost]/*С-UC-3: Book a Session*/
         public async Task<IActionResult> FinalizeBooking(BookingViewModel model)
         {
             if (!string.IsNullOrEmpty(model.SelectedTimeRaw) &&
@@ -64,6 +86,11 @@ namespace CyberClub.Controllers.Customer
                 model.SelectedTime = new TimeSpan(12, 0, 0);
             }
 
+            var startDateTime = model.SelectedDate + model.SelectedTime;
+            if (startDateTime <= DateTime.Now)
+            {
+                ModelState.AddModelError("", "Please select a future time.");
+            }
 
             if (!ModelState.IsValid || model.SelectedSeatId == 0 || model.UserID == 0)
             {
@@ -97,8 +124,7 @@ namespace CyberClub.Controllers.Customer
                 return View("CustomerPanel", model);
             }
 
-            var startDateTime = model.SelectedDate + model.SelectedTime;
-
+            
             var success = await _bookingService.BookSeatAsync(
                 model.SelectedSeatId,
                 model.UserID,
@@ -141,36 +167,9 @@ namespace CyberClub.Controllers.Customer
 
             return RedirectToAction("Panel");
         }
-        public IActionResult Confirmation()
-        {
-            return View();
-        }
 
-        public IActionResult Settings()
-        {
-            var dobStr = HttpContext.Session.GetString("DOB");
-            DateTime dob;
-            if (!string.IsNullOrEmpty(dobStr) && DateTime.TryParse(dobStr, out dob))
-            {
 
-            }
-            else
-            {
-                dob = DateTime.Now;
-            }
-
-            var model = new SettingsViewModel
-            {
-                FullName = HttpContext.Session.GetString("FullName"),
-                Email = HttpContext.Session.GetString("Email"),
-                PhoneNumber = HttpContext.Session.GetString("PhoneNumber"),
-                DOB = dob
-            };
-
-            return View(model);
-        }
-
-        [HttpGet]   /* C-UC-2 */
+        [HttpGet]/* C-UC-2 */
         public async Task<IActionResult> Panel()
         {
             int? userId = HttpContext.Session.GetInt32("UserID");
@@ -227,6 +226,7 @@ namespace CyberClub.Controllers.Customer
             return View("CustomerPanel", viewModel);
         }
 
+
         [HttpGet]
         public async Task<IActionResult> GetSeatsByZone(int zoneId, string startTime, int duration)
         {
@@ -245,8 +245,86 @@ namespace CyberClub.Controllers.Customer
             }));
         }
 
-       
+
+        public IActionResult Settings()
+        {
+            var dobStr = HttpContext.Session.GetString("DOB");
+            DateTime dob;
+            if (!string.IsNullOrEmpty(dobStr) && DateTime.TryParse(dobStr, out dob))
+            {
+
+            }
+            else
+            {
+                dob = DateTime.Now;
+            }
+
+            var model = new SettingsViewModel
+            {
+                FullName = HttpContext.Session.GetString("FullName"),
+                Email = HttpContext.Session.GetString("Email"),
+                PhoneNumber = HttpContext.Session.GetString("PhoneNumber"),
+                DOB = dob
+            };
+
+            return View(model);
+        }
+
+    
+        public async Task<IActionResult> MyBookings()
+        {
+            int userId = HttpContext.Session.GetInt32("UserID") ?? 0;
+
+            await _bookingService.DeleteExpiredBookingsAsync();
+            var bookings = await _bookingService.GetBookingsByUserIdAsync(userId);
+            var tournamentBookings = await _tournamentService.GetTournamentsByUserIdAsync(userId);
+            var model = new MyBookingsViewModel
+            {
+                Bookings = bookings.Select(b => new UserBookingInfo
+                {
+                    Id = b.BookingID,
+                    StartTime = b.StartTime,
+                    ZoneName = b.Zone?.Name ?? "N/A",
+                    SeatNumber = b.Seat?.SeatNumber ?? "N/A",
+                    Duration = b.Duration,
+                    Status = b.Status.ToString()
+                }).ToList(),
+                Tournaments = tournamentBookings.Select(t => new TournamentViewModel
+                {
+                    Id = t.Id,
+                    Name = t.Name,
+                    Game = t.Game,
+                    StartDateTime = t.StartDateTime,
+                    Status = t.Status,
+                    ThemeColor = t.ThemeColor
+                }).ToList()
+            };
+
+            return View("MyBookingsList", model);
+
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CancelTournament(int tournamentId)
+        {
+            int? userId = HttpContext.Session.GetInt32("UserID");
+            if (userId == null)
+                return RedirectToAction("Login", "Auth");
+
+            bool success = await _tournamentService.CancelUserBookingAsync(tournamentId, userId.Value);
+
+            TempData["Message"] = success
+                ? "Tournament registration cancelled."
+                : "Cancellation failed or you are not registered.";
+
+            return RedirectToAction("MyBookings");
+        }
 
 
+        //public IActionResult Confirmation()
+        //{
+        //    return View();
+        //}
     }
 }

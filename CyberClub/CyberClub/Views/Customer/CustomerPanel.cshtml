@@ -1,5 +1,4 @@
 ﻿@model CyberClub.ViewModels.BookingViewModel
-
 @{
     Layout = "~/Views/Customer/_CustomerLayout.cshtml";
 }
@@ -12,49 +11,8 @@
         <input type="hidden" name="Duration" value="@Model.Duration" />
         <input type="hidden" id="SelectedSeatId" name="SelectedSeatId" />
 
-        <div class="cyberclub-map">
-            <div class="pc-section">
-                @foreach (var zone in Model.ZonesWithSeats.Where(z => z.Name != "Playstation"))
-                {
-                    <div class="zone" style="border-color: @zone.Color;">
-                       
-                        <div class="zone-seats">
-                            @foreach (var seat in zone.Seats)
-                            {
-                                <div class="seat pc @(seat.IsAvailable ? "available" : "unavailable")"
-                                     style="background-color:@(seat.IsAvailable ? zone.Color : "#6c757d")"
-                                     onclick="selectSeat(this, '@seat.SeatID')"
-                                     data-id="@seat.SeatID"
-                                     title="@seat.SeatNumber - @(seat.IsAvailable ? "Available" : "Booked")">
-                                    <div class="seat-icon">🖥️</div>
-                                    <div class="seat-number">@seat.SeatNumber</div>
-                                </div>
-                            }
-                        </div>
-                    </div>
-                }
-            </div>
-
-            <div class="console-section">
-                @foreach (var zone in Model.ZonesWithSeats.Where(z => z.Name == "Playstation"))
-                {
-                    <div class="console-zone-wrapper">
-                        <div class="console-seats-scrollable">
-                            @foreach (var seat in zone.Seats)
-                            {
-                                <div class="seat console @(seat.IsAvailable ? "available" : "unavailable")"
-                                     style="background-color:@(seat.IsAvailable ? zone.Color : "#6c757d")"
-                                     onclick="selectSeat(this, '@seat.SeatID')"
-                                     data-id="@seat.SeatID"
-                                     title="@seat.SeatNumber - @(seat.IsAvailable ? "Available" : "Booked")">
-                                    <div class="seat-icon">🎮</div>
-                                    <div class="seat-number">@seat.SeatNumber</div>
-                                </div>
-                            }
-                        </div>
-                    </div>
-                }
-            </div>
+        <div id="seatList">
+            @Html.Partial("_SeatMapPartial", Model)
         </div>
 
         <div class="booking-controls">
@@ -62,7 +20,6 @@
         </div>
     </form>
 </div>
-
 
 <style>
     /* Base Layout */
@@ -257,28 +214,27 @@
             const zoneId = document.querySelector('[name="SelectedZoneId"]').value;
 
             if (!date || !time || !zoneId || !duration) {
-                console.warn("Missing input(s) for seat map update.");
+                console.warn("Missing input for seat map update.");
                 return;
             }
 
-            $.ajax({
-                url: '/Customer/UpdateBooking',
-                type: 'POST',
-                data: {
-                    SelectedDate: date,
-                    SelectedTimeRaw: time,
-                    Duration: duration,
-                    SelectedZoneId: zoneId
-                },
-                success: function (response) {
-                    console.log("[DEBUG] Seat map updated.");
-                    const newSeats = $(response).find('#seatList').html();
-                    $('#seatList').html(newSeats);
-                },
-                error: function (xhr, status, error) {
-                    console.error("Failed to update seat map:", error);
-                }
-            });
+                   $.ajax({
+            url: '/Customer/UpdateBooking',
+            type: 'POST',
+            data: {
+                SelectedDate: date,
+                SelectedTimeRaw: time,
+                Duration: duration,
+                SelectedZoneId: zoneId
+            },
+            success: function (response) {
+                $('#seatList').html(response); 
+            },
+            error: function (xhr, status, error) {
+                console.error("Failed to update seat map:", error);
+            }
+        });
+
         }
 
         $(document).ready(function () {

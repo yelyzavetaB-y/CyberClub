@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="Views\Shared\Components\_SeatMapPartial.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\CyberClub.Domain\CyberClub.Domain.csproj" />
     <ProjectReference Include="..\CyberClub.Infrastructure\CyberClub.Infrastructure.csproj" />
   </ItemGroup>

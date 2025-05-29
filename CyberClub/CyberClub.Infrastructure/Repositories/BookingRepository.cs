@@ -259,7 +259,70 @@ WHERE s.ZoneID = @ZoneId
             return await _queryBuilder.ExecuteQueryAsync(query, parameters);
         }
 
+        public async Task<List<Booking>> GetAllBookingsAsync()
+        {
+            List<Booking> bookings = new List<Booking>();
 
+            string query = @"
+        SELECT b.BookingID, b.UserID, u.Email, b.SeatID, s.SeatNumber, s.ZoneID, z.Name AS ZoneName,
+               b.StartTime, b.Duration, b.Status
+        FROM Booking b
+        JOIN [User] u ON b.UserID = u.UserID
+        JOIN Seat s ON b.SeatID = s.SeatID
+        JOIN Zone z ON s.ZoneID = z.ZoneID
+        ORDER BY b.StartTime DESC";
+
+            await _queryBuilder.ExecuteQueryAsync(query, reader =>
+            {
+                while (reader.Read())
+                {
+                    bookings.Add(new Booking
+                    {
+                        BookingID = reader.GetInt32(reader.GetOrdinal("BookingID")),
+                        UserId = reader.GetInt32(reader.GetOrdinal("UserID")),
+                        StartTime = reader.GetDateTime(reader.GetOrdinal("StartTime")),
+                        Duration = reader.GetInt32(reader.GetOrdinal("Duration")),
+                        Status = Enum.Parse<Status>(reader.GetString(reader.GetOrdinal("Status"))),
+                        Seat = new Seat
+                        {
+                            SeatID = reader.GetInt32(reader.GetOrdinal("SeatID")),
+                            SeatNumber = reader.GetString(reader.GetOrdinal("SeatNumber")),
+                            ZoneID = reader.GetInt32(reader.GetOrdinal("ZoneID")),
+                        },
+                        Zone = new Zone
+                        {
+                            ZoneID = reader.GetInt32(reader.GetOrdinal("ZoneID")),
+                            Name = reader.GetString(reader.GetOrdinal("ZoneName"))
+                        },
+                        User = new User
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("UserID")),
+                            Email = reader.GetString(reader.GetOrdinal("Email"))
+                        }
+                    });
+                }
+            });
+
+            return bookings;
+        }
+
+
+        public async Task<bool> UpdateBookingStatusAsync(int bookingId, Status newStatus)
+        {
+            const string query = @"
+        UPDATE Booking
+        SET Status = @Status
+        WHERE BookingID = @BookingID";
+
+            var parameters = new[]
+            {
+        new SqlParameter("@Status", newStatus.ToString()),
+        new SqlParameter("@BookingID", bookingId)
+    };
+
+            int rowsAffected = await _queryBuilder.ExecuteQueryAsync(query, parameters);
+            return rowsAffected > 0;
+        }
     }
 
 }

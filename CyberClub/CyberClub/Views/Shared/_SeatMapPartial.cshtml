@@ -1,0 +1,53 @@
+﻿@model CyberClub.ViewModels.BookingViewModel
+
+<div id="seatList">
+    <div class="cyberclub-map">
+        <div class="pc-section">
+            @foreach (var zone in Model.ZonesWithSeats.Where(z => z.Name != "Playstation"))
+            {
+                <div class="zone" style="border-color: @zone.Color;">
+                    <div class="zone-seats">
+                        @foreach (var seat in zone.Seats)
+                        {
+                            <div class="seat pc @(seat.IsAvailable ? "available" : "unavailable")"
+                                 style="background-color:@(seat.IsAvailable ? zone.Color : "#6c757d")"
+                                 onclick="selectSeat(this, '@seat.SeatID')"
+                                 data-id="@seat.SeatID"
+                                 title="@seat.SeatNumber - @(seat.IsAvailable ? "Available" : "Booked")">
+                                <div class="seat-icon">🖥️</div>
+                                <div class="seat-number">@seat.SeatNumber</div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="console-section">
+            @foreach (var zone in Model.ZonesWithSeats.Where(z => z.Name == "Playstation"))
+            {
+                <div class="console-zone-wrapper">
+                    <div class="console-seats-scrollable">
+                        @foreach (var seat in zone.Seats)
+                        {
+                            <div class="seat console @(seat.IsAvailable ? "available" : "unavailable")"
+                                 style="background-color:@(seat.IsAvailable ? zone.Color : "#6c757d")"
+                                 onclick="selectSeat(this, '@seat.SeatID')"
+                                 data-id="@seat.SeatID"
+                                 title="@seat.SeatNumber - @(seat.IsAvailable ? "Available" : "Booked")">
+                                <div class="seat-icon">🎮</div>
+                                <div class="seat-number">@seat.SeatNumber</div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+@functions {
+    string GetZoneColor(int index)
+    {
+        var palette = new[] { "#28a745", "#007bff", "#ffc107", "#6610f2", "#17a2b8", "#e83e8c" };
+        return palette[index % palette.Length];
+    }
+}

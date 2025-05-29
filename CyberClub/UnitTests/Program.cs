@@ -5,8 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services
-    .AddControllers()
-    .AddApplicationPart(typeof(CyberClub.Api.Controllers.GeneralController).Assembly); 
+    .AddControllers();
+   
 builder.Services.AddEndpointsApiExplorer(); 
 
 var app = builder.Build();

@@ -1,4 +1,5 @@
 ﻿using CyberClub.Domain.Models;
+using CyberClub.Domain.Models.Enum;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,5 +17,7 @@ namespace CyberClub.Domain.Interfaces
         Task<bool> CancelBookingAsync(int bookingId);
         Task<List<Booking>> GetBookingsForZoneAndTimeAsync(int zoneId, DateTime startTime, int durationMinutes);
         Task<int> DeleteExpiredBookingsAsync();
+        Task<List<Booking>> GetAllBookingsAsync();
+        Task<bool> UpdateBookingStatusAsync(int bookingId, Status newStatus);
     }
 }

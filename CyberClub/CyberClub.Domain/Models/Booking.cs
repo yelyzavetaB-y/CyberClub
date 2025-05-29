@@ -18,5 +18,6 @@ namespace CyberClub.Domain.Models
 
         public Seat? Seat { get; set; }
         public Zone? Zone { get; set; }
+        public User? User { get; set; }
     }
 }
